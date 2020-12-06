@@ -1,6 +1,8 @@
 typealias Ram = UByteArray
 typealias U8 = UByte
 
+data class U16(val lo: U8, val hi: U8)
+
 const val RAM_SIZE = 1024 * 64
 
 data class Nes(
@@ -13,7 +15,6 @@ data class Nes(
         var status: U8,
 )
 
-data class U16(val lo: UByte, val hi: UByte)
 
 fun Init() = Nes(ram = Ram(RAM_SIZE), 0u, 0u, 0u, 0u, 0, 0u)
 
