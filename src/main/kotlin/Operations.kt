@@ -1,6 +1,6 @@
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
-val opcode = listOf(
+val opcodes = listOf(
 // ROW 0
     Op("BRK", brk(::immediate), 7),
     Op("ORA", ora(::indirectX), 6),
