@@ -6,6 +6,11 @@ fun negativeFlag(status: U8, reg: U8): U8 =
 
 fun immediate(nesArch: NesArch): U16 = nesArch.pc
 
+// TODO Check
+fun implied(nesArch: NesArch): U16 = nesArch.pc
+fun relative(nesArch: NesArch): U16 = nesArch.pc
+fun indirect(nesArch: NesArch): U16 = nesArch.pc
+//
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
 fun absolute(nesArch: NesArch, reg: U8 = 0u): U16 = u16(read16(nesArch.ram, nesArch.pc) + reg)
