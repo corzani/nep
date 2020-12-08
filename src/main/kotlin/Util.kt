@@ -7,6 +7,7 @@ typealias AddressMode = (NesArch) -> U16
 fun u8(value: UInt) = value.toUByte()
 fun u8(value: Int) = value.toUByte()
 
+fun u16(value: Int) = value.toUShort()
 fun u16(value: UInt) = value.toUShort()
 fun u16(value: U8) = value.toUShort()
 
@@ -16,7 +17,7 @@ fun read(ram: Ram, address: U16): U8 = ram[address.toInt()]
 fun NesArch.read(address: U16): U8 = read(ram, address)
 
 fun read16(ram: Ram, address: U16): U16 =
-        ram[address.toInt() + 1].toUShort().rotateLeft(8) or ram[address.toInt()].toUShort()
+    ram[address.toInt() + 1].toUShort().rotateLeft(8) or ram[address.toInt()].toUShort()
 
 fun U16.splitLoHi(): U16Split = U16Split(lo = (this and 0x00FFu).toUByte(), hi = this.rotateRight(8).toUByte())
 
@@ -34,5 +35,8 @@ fun write16(ram: Ram, address: U16, data: U16) = data.splitLoHi { lo: U8, hi: U8
 }
 
 fun write(ram: Ram, address: U16, data: U8) = data.let { ram[address.toInt()] = it }
+
+fun flagsOf(status: U8, reg: U8, vararg functions: (status: U8, reg: U8) -> U8) =
+    functions.fold(status) { acc, fn -> fn(acc, reg) }
 
 fun NesArch.read16(address: U16): U16 = read16(ram, address)

@@ -40,4 +40,12 @@ class MainTest {
         write16(ram, 2u, 0xF012u)
         assertEquals(expectedRam.toList(), ram.toList())
     }
+
+    @Test
+    fun `LDA from memory`() {
+        val program = ubyteArrayOf(0xa5u, 0x10u, 0x00u)
+        val nesArch = load(program)
+        write(nesArch.ram, 0x10u, 0x55u)
+        runAll(nesArch)
+    }
 }

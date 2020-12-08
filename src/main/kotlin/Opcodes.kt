@@ -1,22 +1,3 @@
-fun flagsOf(status: U8, reg: U8, vararg functions: (status: U8, reg: U8) -> U8) =
-        functions.fold(status) { acc, fn -> fn(acc, reg) }
-
-fun lda(mode: AddressMode) = { nesArch: NesArch ->
-    read(nesArch.ram, mode(nesArch)).let { data ->
-        nesArch.accumulator = data
-    }
-    nesArch.status = flagsOf(nesArch.status, nesArch.accumulator, ::zeroFlag, ::negativeFlag)
-}
-
-fun sta(addressMode: AddressMode) = { nesArch: NesArch ->
-    write(nesArch.ram, addressMode(nesArch), nesArch.accumulator)
-}
-
-fun tax(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.x = nesArch.accumulator
-    nesArch.status = flagsOf(nesArch.status, nesArch.x, ::zeroFlag, ::negativeFlag)
-}
-
 fun adc(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun and(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun asl(addressMode: AddressMode) = { nesArch: NesArch -> }
@@ -46,6 +27,12 @@ fun inx(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun iny(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun jmp(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun jsr(addressMode: AddressMode) = { nesArch: NesArch -> }
+
+fun lda(mode: AddressMode) = { nesArch: NesArch ->
+    read(nesArch.ram, mode(nesArch)).let { data -> nesArch.accumulator = data }
+    nesArch.status = flagsOf(nesArch.status, nesArch.accumulator, ::zeroFlag, ::negativeFlag)
+}
+
 fun ldx(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun ldy(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun lsr(addressMode: AddressMode) = { nesArch: NesArch -> }
@@ -63,10 +50,20 @@ fun sbc(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun sec(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun sed(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun sei(addressMode: AddressMode) = { nesArch: NesArch -> }
+
+fun sta(addressMode: AddressMode) = { nesArch: NesArch ->
+    write(nesArch.ram, addressMode(nesArch), nesArch.accumulator)
+}
+
 fun stx(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun sty(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun tsx(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun tay(addressMode: AddressMode) = { nesArch: NesArch -> }
+fun tax(addressMode: AddressMode) = { nesArch: NesArch ->
+    nesArch.x = nesArch.accumulator
+    nesArch.status = flagsOf(nesArch.status, nesArch.x, ::zeroFlag, ::negativeFlag)
+}
+
 fun txa(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun txs(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun tya(addressMode: AddressMode) = { nesArch: NesArch -> }
