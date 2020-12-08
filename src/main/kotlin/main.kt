@@ -9,14 +9,14 @@ data class NesArch(
     var stackpointer: U8 = 0x00u,
     var pc: U16 = u16(0x0000u),
     var status: U8 = 0x00u,
-    val size: Int = 0
+    val cartSize: Int = 0
 )
 
 fun testAll(nesArch: NesArch) =
-    testLoop(nesArch, instructionHandler(nesArch), u16(CARTRIDGE_ROM_ADDRESS + nesArch.size))
+    testLoop(nesArch, instructionHandler(nesArch), u16(CARTRIDGE_ROM_ADDRESS + nesArch.cartSize))
 
 // TODO Silly Implementation
-fun load(program: Program): NesArch = NesArch(size = program.size).also { nesArch ->
+fun load(program: Program): NesArch = NesArch(cartSize = program.size).also { nesArch ->
     program.forEachIndexed { index, uByte ->
         nesArch.ram[index + CARTRIDGE_ROM_ADDRESS] = uByte
     }
