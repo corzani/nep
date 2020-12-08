@@ -4,7 +4,7 @@ plugins {
     kotlin("jvm") version "1.4.10"
     application
 }
-group = "me.yak"
+group = "io.github.corzani"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -13,9 +13,14 @@ repositories {
 dependencies {
     testImplementation(kotlin("test-junit"))
 }
-tasks.withType<KotlinCompile>() {
+tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 application {
     mainClassName = "MainKt"
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.ExperimentalUnsignedTypes"
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.ExperimentalStdlibApi"
 }

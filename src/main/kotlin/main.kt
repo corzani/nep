@@ -2,20 +2,20 @@ const val RAM_SIZE = 1024 * 64
 const val CARTRIDGE_ROM_ADDRESS = 0x8000
 
 data class NesArch(
-    val ram: Ram = Ram(RAM_SIZE),
-    var accumulator: U8 = 0x00u,
-    var x: U8 = 0x00u,
-    var y: U8 = 0x00u,
-    var stackpointer: U8 = 0x00u,
-    var pc: U16 = u16(0x0000u),
-    var status: U8 = 0x00u
+        val ram: Ram = Ram(RAM_SIZE),
+        var accumulator: U8 = 0x00u,
+        var x: U8 = 0x00u,
+        var y: U8 = 0x00u,
+        var stackpointer: U8 = 0x00u,
+        var pc: U16 = u16(0x0000u),
+        var status: U8 = 0x00u
 )
 
 // TODO Silly Implementation
-@ExperimentalStdlibApi
-@ExperimentalUnsignedTypes
+
+
 fun runProgram(program: Program) = NesArch().let { nesArch ->
-    program.forEachIndexed() { index, uByte -> nesArch.ram[index + CARTRIDGE_ROM_ADDRESS] = uByte }
+    program.forEachIndexed { index, uByte -> nesArch.ram[index + CARTRIDGE_ROM_ADDRESS] = uByte }
 
     val runInstruction = attach(nesArch)
     mainLoop(nesArch, runInstruction)
@@ -26,8 +26,6 @@ tailrec fun mainLoop(nesArch: NesArch, runInstruction: (opcode: U8) -> Unit) {
     mainLoop(nesArch, runInstruction)
 }
 
-@ExperimentalUnsignedTypes
-@ExperimentalStdlibApi
 // TODO toInt shouldn't be here
 fun attach(nesArch: NesArch) = { opcode: U8 -> opcodes[opcode.toInt()].istruction(nesArch) }
 
@@ -51,19 +49,17 @@ enum class Flag(val bitMask: U8) {
 //fun getFlag(status: U8, flag: Flag): Boolean = status.and(flag.bitMask).toInt() > 0;
 //fun Nes.getFlag(flag: Flag): Boolean = getFlag(status, flag)
 //
-@ExperimentalUnsignedTypes
+
 fun retrieveFlag(status: U8, flag: Flag, value: Boolean = true) = when (value) {
     true -> status or (flag.bitMask)
     false -> status and (flag.bitMask.inv())
 }
 
-@ExperimentalUnsignedTypes
 fun setFlag(nesArch: NesArch, flag: Flag, value: Boolean) = nesArch.apply {
     status = retrieveFlag(status, flag)
 }
 
-@ExperimentalStdlibApi
 fun main(args: Array<String>) {
-    val program : Program= UByteArray(3)
+    val program: Program = UByteArray(3)
     runProgram(program)
 }

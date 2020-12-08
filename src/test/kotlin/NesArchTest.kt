@@ -2,7 +2,7 @@ import org.junit.Test
 
 internal class NesArchTest {
 
-   @Test
+    @Test
     fun getRam() {
     }
 

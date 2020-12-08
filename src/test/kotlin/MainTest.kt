@@ -1,8 +1,6 @@
 import org.junit.Test
 import kotlin.test.assertEquals
 
-@ExperimentalUnsignedTypes
-@ExperimentalStdlibApi
 class MainTest {
 
     @Test

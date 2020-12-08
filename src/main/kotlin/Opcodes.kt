@@ -8,8 +8,6 @@ fun lda(mode: AddressMode) = { nesArch: NesArch ->
     nesArch.status = flagsOf(nesArch.status, nesArch.accumulator, ::zeroFlag, ::negativeFlag)
 }
 
-@ExperimentalUnsignedTypes
-@ExperimentalStdlibApi
 fun sta(addressMode: AddressMode) = { nesArch: NesArch ->
     write(nesArch.ram, addressMode(nesArch), nesArch.accumulator)
 }
