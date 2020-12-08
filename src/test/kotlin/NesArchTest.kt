@@ -1,6 +1,6 @@
 import org.junit.Test
 
-internal class NesTest {
+internal class NesArchTest {
 
    @Test
     fun getRam() {

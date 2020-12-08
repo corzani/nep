@@ -1,7 +1,8 @@
 typealias Ram = UByteArray
+typealias Program = UByteArray
 typealias U8 = UByte
 typealias U16 = UShort
-typealias AddressMode = (Nes) -> U16
+typealias AddressMode = (NesArch) -> U16
 
 fun u8(value: UInt) = value.toUByte()
 fun u8(value: Int) = value.toUByte()
@@ -12,12 +13,12 @@ fun u16(value: U8) = value.toUShort()
 data class U16Split(val lo: U8, val hi: U8)
 
 fun read(ram: Ram, address: U16): U8 = ram[address.toInt()]
-fun Nes.read(address: U16): U8 = read(ram, address)
+fun NesArch.read(address: U16): U8 = read(ram, address)
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
 fun read16(ram: Ram, address: U16): U16 =
-    ram[address.toInt() + 1].toUShort().rotateLeft(8) or ram[address.toInt()].toUShort()
+        ram[address.toInt() + 1].toUShort().rotateLeft(8) or ram[address.toInt()].toUShort()
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
@@ -46,4 +47,9 @@ fun write16(ram: Ram, address: U16, data: U16) = data.splitLoHi { lo: U8, hi: U8
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
-fun Nes.read16(address: U16): U16 = read16(ram, address)
+fun write(ram: Ram, address: U16, data: U8) = data.let { ram[address.toInt()] = it }
+
+
+@ExperimentalUnsignedTypes
+@ExperimentalStdlibApi
+fun NesArch.read16(address: U16): U16 = read16(ram, address)

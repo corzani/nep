@@ -4,39 +4,39 @@ fun zeroFlag(status: U8, reg: U8): U8 =
 fun negativeFlag(status: U8, reg: U8): U8 =
     retrieveFlag(status, Flag.N, (reg and 0x80u) == u8(0x80))
 
-fun immediate(nes: Nes): U16 = nes.cpu.pc
+fun immediate(nesArch: NesArch): U16 = nesArch.pc
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
-fun absolute(nes: Nes, reg: U8 = 0u): U16 = u16(read16(nes.ram, nes.cpu.pc) + reg)
+fun absolute(nesArch: NesArch, reg: U8 = 0u): U16 = u16(read16(nesArch.ram, nesArch.pc) + reg)
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
-fun absoluteX(nes: Nes): U16 = absolute(nes, nes.cpu.x)
+fun absoluteX(nesArch: NesArch): U16 = absolute(nesArch, nesArch.x)
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
-fun absoluteY(nes: Nes): U16 = absolute(nes, nes.cpu.y)
+fun absoluteY(nesArch: NesArch): U16 = absolute(nesArch, nesArch.y)
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
-fun zeroPage(nes: Nes, reg: U8 = 0u): U16 = u16(read(nes.ram, nes.cpu.pc) + reg)
+fun zeroPage(nesArch: NesArch, reg: U8 = 0u): U16 = u16(read(nesArch.ram, nesArch.pc) + reg)
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
-fun zeroPageX(nes: Nes): U16 = zeroPage(nes, nes.cpu.x)
+fun zeroPageX(nesArch: NesArch): U16 = zeroPage(nesArch, nesArch.x)
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
-fun zeroPageY(nes: Nes): U16 = zeroPage(nes, nes.cpu.y)
+fun zeroPageY(nesArch: NesArch): U16 = zeroPage(nesArch, nesArch.y)
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
-fun indirectX(nes: Nes): U16 = zeroPageX(nes)
+fun indirectX(nesArch: NesArch): U16 = zeroPageX(nesArch)
     .splitLoHi { lo: U8, hi: U8 -> fromLoHi(lo = lo, hi = u8(hi + 1u)) }
 
 @ExperimentalUnsignedTypes
 @ExperimentalStdlibApi
-fun indirectY(nes: Nes): U16 = read(nes.ram, nes.cpu.pc)
-    .let { pc -> read16(nes.ram, u16(pc)) + u16(nes.cpu.y) }
+fun indirectY(nesArch: NesArch): U16 = read(nesArch.ram, nesArch.pc)
+    .let { pc -> read16(nesArch.ram, u16(pc)) + u16(nesArch.y) }
     .let(::u16)
