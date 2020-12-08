@@ -47,10 +47,4 @@ fun setFlag(nesArch: NesArch, flag: Flag, value: Boolean) = nesArch.apply {
 }
 
 //
-//fun main(args: Array<String>) {
-//    val nes = Init().apply {
-//        setFlag(Flag.C)
-//        setFlag(Flag.N)
-//    }
-//    println(nes.status)
-//}
+fun main(args: Array<String>) {}
