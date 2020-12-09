@@ -1,3 +1,5 @@
+package io.github.corzani.nep
+
 typealias Ram = UByteArray
 typealias Program = UByteArray
 typealias U8 = UByte

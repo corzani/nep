@@ -1,3 +1,5 @@
+package io.github.corzani.nep
+
 const val RAM_SIZE = 1024 * 64
 const val CARTRIDGE_ROM_ADDRESS = 0x8000
 
@@ -66,8 +68,8 @@ enum class Flag(val bitMask: U8) {
 //fun Nes.writeFlag(address: Int, data: U8) = writeFlag(ram, address, data)
 
 //
-//fun getFlag(status: U8, flag: Flag): Boolean = status.and(flag.bitMask).toInt() > 0;
-//fun Nes.getFlag(flag: Flag): Boolean = getFlag(status, flag)
+//fun getFlag(status: U8, flag: io.github.corzani.nep.Flag): Boolean = status.and(flag.bitMask).toInt() > 0;
+//fun Nes.getFlag(flag: io.github.corzani.nep.Flag): Boolean = getFlag(status, flag)
 //
 
 fun retrieveFlag(status: U8, flag: Flag, value: Boolean = true) = when (value) {

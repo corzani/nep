@@ -1,3 +1,5 @@
+package io.github.corzani.nep
+
 val opcodes = listOf(
 // ROW 0
     Op("BRK", brk(::immediate), 7),

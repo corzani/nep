@@ -1,3 +1,5 @@
+package io.github.corzani.nep
+
 import io.cucumber.junit.Cucumber
 import org.junit.runner.RunWith
 

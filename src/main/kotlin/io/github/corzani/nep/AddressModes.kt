@@ -1,3 +1,5 @@
+package io.github.corzani.nep
+
 fun zeroFlag(status: U8, reg: U8): U8 =
         retrieveFlag(status, Flag.Z, reg.toInt() == 0)
 

@@ -1,3 +1,5 @@
+package io.github.corzani.nep
+
 fun adc(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun and(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun asl(addressMode: AddressMode) = { nesArch: NesArch -> }

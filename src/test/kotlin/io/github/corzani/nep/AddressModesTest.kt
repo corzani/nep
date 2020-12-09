@@ -1,3 +1,5 @@
+package io.github.corzani.nep
+
 import org.junit.Test
 import kotlin.test.assertEquals
 
