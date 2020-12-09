@@ -1,15 +1,19 @@
 const val RAM_SIZE = 1024 * 64
 const val CARTRIDGE_ROM_ADDRESS = 0x8000
 
+fun initRam(ram: Ram) {
+    write16(ram, 0xFFFCu, 0x8000u)
+}
+
 data class NesArch(
-    val ram: Ram = Ram(RAM_SIZE),
+    val ram: Ram = Ram(RAM_SIZE).apply(::initRam),
     var accumulator: U8 = 0x00u,
     var x: U8 = 0x00u,
     var y: U8 = 0x00u,
     var stackpointer: U8 = 0x00u,
-    var pc: U16 = u16(0x0000u),
     var status: U8 = 0x00u,
-    val cartSize: Int = 0
+    val cartSize: Int = 0,
+    var pc: U16 = read16(ram, 0xFFFCu),
 )
 
 fun testAll(nesArch: NesArch) =
