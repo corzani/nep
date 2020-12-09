@@ -42,10 +42,12 @@ class MainTest {
     }
 
     @Test
-    fun `LDA from memory`() {
-        val program = ubyteArrayOf(0xa5u, 0x10u, 0x00u)
-        val nesArch = load(program)
-        write(nesArch.ram, 0x10u, 0x55u)
-        runAll(nesArch)
-    }
+    fun `LDA from memory`() = load(ubyteArrayOf(0xa5u, 0x10u, 0x00u))
+        .run {
+            write(ram, 0x10u, 0xF5u)
+            testArch(this)
+
+            assertEquals(0xF5u, accumulator);
+            assertEquals(statusWith(Flag.N), status)
+        }
 }

@@ -16,7 +16,7 @@ data class NesArch(
     var pc: U16 = read16(ram, 0xFFFCu),
 )
 
-fun testAll(nesArch: NesArch) =
+fun testArch(nesArch: NesArch) =
     testLoop(nesArch, instructionHandler(nesArch), u16(CARTRIDGE_ROM_ADDRESS + nesArch.cartSize))
 
 // TODO Silly Implementation
@@ -49,6 +49,8 @@ fun instructionHandler(nesArch: NesArch) =
 
 data class Op(val name: String, val istruction: (NesArch) -> Unit, val cycles: Int)
 
+fun statusWith(vararg flags: Flag): U8 = flags.fold(u8(0)) { acc, flag -> acc or flag.bitMask }
+
 enum class Flag(val bitMask: U8) {
     C(0x01u),
     Z(0x02u),
@@ -78,4 +80,5 @@ fun setFlag(nesArch: NesArch, flag: Flag, value: Boolean) = nesArch.apply {
 }
 
 fun main(args: Array<String>) {
+
 }
