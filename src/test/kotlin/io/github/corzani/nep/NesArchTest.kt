@@ -1,6 +1,6 @@
 package io.github.corzani.nep
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 internal class NesArchTest {
 

@@ -1,6 +1,6 @@
 package io.github.corzani.nep
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class MainTest {
@@ -36,20 +36,12 @@ class MainTest {
 
     @Test
     fun `Write 16 Bit Unsigned Short Int to Ram`() {
-        val ram = ubyteArrayOf(0xABu, 0xB6u, 0x23u, 0xE3u, 0x45u)
-        val expectedRam = ubyteArrayOf(0xABu, 0xB6u, 0x12u, 0xF0u, 0x45u)
+        val ram = memoryOf(0xABu, 0xB6u, 0x23u, 0xE3u, 0x45u)
+        val expectedRam = memoryOf(0xABu, 0xB6u, 0x12u, 0xF0u, 0x45u)
 
         write16(ram, 2u, 0xF012u)
         assertEquals(expectedRam.toList(), ram.toList())
     }
 
-    @Test
-    fun `LDA from memory`() = load(ubyteArrayOf(0xa5u, 0x10u, 0x00u))
-        .run {
-            write(ram, 0x10u, 0xF5u)
-            testArch(this)
 
-            assertEquals(0xF5u, accumulator);
-            assertEquals(statusWith(Flag.N), status)
-        }
 }

@@ -7,6 +7,10 @@ fun initRam(ram: Ram) {
     write16(ram, 0xFFFCu, 0x8000u)
 }
 
+fun NesArch.initRam() {
+    write16(ram, 0xFFFCu, 0x8000u)
+}
+
 data class NesArch(
     val ram: Ram = Ram(RAM_SIZE).apply(::initRam),
     var accumulator: U8 = 0x00u,
@@ -15,20 +19,27 @@ data class NesArch(
     var stackpointer: U8 = 0x00u,
     var status: U8 = 0x00u,
     val cartSize: Int = 0,
-    var pc: U16 = read16(ram, 0xFFFCu),
+    var pc: U16 = read16(ram, 0xFFFCu)
 )
 
-fun testArch(nesArch: NesArch) =
+fun createNes(block: NesArch.() -> Unit) = block(NesArch())
+
+@JvmName("testFn")
+fun test(nesArch: NesArch) =
     testLoop(nesArch, instructionHandler(nesArch), u16(CARTRIDGE_ROM_ADDRESS + nesArch.cartSize))
 
+fun NesArch.test() = testLoop(this, instructionHandler(this), u16(CARTRIDGE_ROM_ADDRESS + this.cartSize))
+
 // TODO Silly Implementation
-fun load(program: Program): NesArch = NesArch(cartSize = program.size).also { nesArch ->
+fun loadFromMemory(program: Program): NesArch = NesArch(cartSize = program.size).also { nesArch ->
     program.forEachIndexed { index, uByte ->
         nesArch.ram[index + CARTRIDGE_ROM_ADDRESS] = uByte
     }
 }
 
 fun runAll(nesArch: NesArch) = mainLoop(nesArch, instructionHandler(nesArch))
+
+fun NesArch.start() = mainLoop(this, instructionHandler(this))
 
 tailrec fun mainLoop(nesArch: NesArch, runInstruction: (opcode: U8) -> Unit) {
     runInstruction(read(nesArch.ram, nesArch.pc))

@@ -274,3 +274,5 @@ val opcodes = listOf(
     Op("INC", inc(::absoluteX), 7),
     Op("???", xxx(::implied), 7)
 )
+
+fun getOperatorsMap() = opcodes.mapIndexed { idx, op -> op.name to idx }.toMap()

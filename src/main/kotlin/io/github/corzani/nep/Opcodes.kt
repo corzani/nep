@@ -1,7 +1,13 @@
 package io.github.corzani.nep
 
 fun adc(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun and(addressMode: AddressMode) = { nesArch: NesArch -> }
+fun and(addressMode: AddressMode) = { nesArch: NesArch ->
+    read(nesArch.ram, addressMode(nesArch)).let { address ->
+        nesArch.accumulator = nesArch.accumulator and address
+        nesArch.status = flagsOf(nesArch.status, nesArch.accumulator, ::zeroFlag, ::negativeFlag)
+    }
+}
+
 fun asl(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun bcc(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun bcs(addressMode: AddressMode) = { nesArch: NesArch -> }
@@ -30,8 +36,8 @@ fun iny(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun jmp(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun jsr(addressMode: AddressMode) = { nesArch: NesArch -> }
 
-fun lda(mode: AddressMode) = { nesArch: NesArch ->
-    read(nesArch.ram, mode(nesArch)).let { data -> nesArch.accumulator = data }
+fun lda(addressMode: AddressMode) = { nesArch: NesArch ->
+    read(nesArch.ram, addressMode(nesArch)).let { data -> nesArch.accumulator = data }
     nesArch.status = flagsOf(nesArch.status, nesArch.accumulator, ::zeroFlag, ::negativeFlag)
 }
 

@@ -18,9 +18,11 @@ dependencies {
     testImplementation("io.cucumber:cucumber-java8:6.9.0")
     testImplementation("io.cucumber:cucumber-junit:6.9.0")
 }
+
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
+
 application {
     mainClassName = "MainKt"
 }
