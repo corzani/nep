@@ -22,7 +22,6 @@ class BddRules : En {
                 "Y" -> Y
                 else -> throw PendingException()
             }
-
         }
 
         ParameterType("binOrHex", "0[xX][0-9a-fA-F]+|0[bB][0-1]+") { num ->
@@ -43,6 +42,14 @@ class BddRules : En {
                 "U" -> Flag.U
                 "V" -> Flag.V
                 "N" -> Flag.N
+                else -> throw PendingException()
+            }
+        }
+
+        ParameterType("enableable", "ENABLED|DISABLED") { value ->
+            when (value) {
+                "ENABLED" -> true
+                "DISABLED" -> false
                 else -> throw PendingException()
             }
         }
@@ -94,7 +101,9 @@ class BddRules : En {
             }
         }
 
-        And("{flag} flag should be {boolean}") { flag: Flag, be: Boolean ->
+        And("{flag} flag should be {enableable}") { flag: Flag, be: Boolean ->
+
+
 
         }
     }
