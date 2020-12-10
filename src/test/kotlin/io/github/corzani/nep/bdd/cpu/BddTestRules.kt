@@ -1,9 +1,10 @@
-package io.github.corzani.nep.bdd
+package io.github.corzani.nep.bdd.cpu
 
 import io.cucumber.java8.En
 import io.cucumber.java8.PendingException
 import io.github.corzani.nep.*
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 var lastInstance: NesArch? = null
 
@@ -54,19 +55,6 @@ class BddRules : En {
             }
         }
 
-
-//        Given("this data table:") { peopleTable: DataTable ->
-//            val people: List<Person> = peopleTable.asList(Person::class.java)
-//            assertEquals("Aslak", people[0].first)
-//            assertEquals("Hellesy", people[0].last)
-//        }
-//
-//        val alreadyHadThisManyCukes = 1
-//        Given("I have {long} cukes in my belly") { n: Long ->
-//            assertEquals(1, alreadyHadThisManyCukes)
-//            assertEquals(42L, n)
-//        }
-
         When("code is executed") {
             checkNotNull(lastInstance, { "Cartridge Memory NOT loaded" })
             lastInstance!!.test()
@@ -78,10 +66,6 @@ class BddRules : En {
             lastInstance = memoryOf(*mem).let(::loadFromMemory)
         }
 
-
-        Then("the {} register is {int}") {
-
-        }
         And("{register} register is {binOrHex}") { register: Register, num: Int ->
             checkNotNull(lastInstance)
             when (register) {
@@ -91,22 +75,37 @@ class BddRules : En {
             }
         }
 
+        And("{binOrHex} is stored at address {binOrHex}") { data: Int, address: Int ->
+            checkNotNull(lastInstance)
+            lastInstance!!.write(u16(address), u8(data))
+        }
+
         Then("{register} register should be {binOrHex}") { register: Register, num: Int ->
             checkNotNull(lastInstance)
             val expect = u8(num)
             when (register) {
-                Accumulator -> assertEquals(expect, lastInstance!!.accumulator)
-                X -> assertEquals(expect, lastInstance!!.x)
-                Y -> assertEquals(expect, lastInstance!!.y)
+                Accumulator -> assertMemoryEquals(expect, lastInstance!!.accumulator)
+                X -> assertMemoryEquals(expect, lastInstance!!.x)
+                Y -> assertMemoryEquals(expect, lastInstance!!.y)
             }
         }
 
         And("{flag} flag should be {enableable}") { flag: Flag, be: Boolean ->
+            checkNotNull(lastInstance)
+            when (be) {
+                true -> assertTrue(
+                    (lastInstance!!.status and flag.bitMask).compareTo(0u) > 0,
+                    "Flag ${flag} should be ENABLED but seems to be DISABLED"
+                )
+                false -> assertTrue(
+                    (lastInstance!!.status and flag.bitMask).compareTo(0u) == 0,
+                    "Flag ${flag} should be DISABLED but seems to be ENABLED"
+                )
+            }
+        }
 
-
-
+        And("CPU should have performed {int} cycles") { cycles: Int ->
+            assertEquals(1, 1)
         }
     }
 }
-
-data class Person(val first: String?, val last: String?)

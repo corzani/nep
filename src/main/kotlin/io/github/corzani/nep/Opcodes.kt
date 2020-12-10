@@ -2,7 +2,8 @@ package io.github.corzani.nep
 
 fun adc(addressMode: AddressMode) = { nesArch: NesArch -> }
 fun and(addressMode: AddressMode) = { nesArch: NesArch ->
-    read(nesArch.ram, addressMode(nesArch)).let { address ->
+    val computedAddr = addressMode(nesArch)
+    read(nesArch.ram, computedAddr).let { address ->
         nesArch.accumulator = nesArch.accumulator and address
         nesArch.status = flagsOf(nesArch.status, nesArch.accumulator, ::zeroFlag, ::negativeFlag)
     }
