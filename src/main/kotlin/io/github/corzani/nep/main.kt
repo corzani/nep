@@ -57,7 +57,6 @@ fun testLoop(
     runUntilPC: U16
 ) {
     while (nesArch.pc < runUntilPC) {
-        println(nesArch.pc.toInt())
         nesArch.cycles += runInstruction(read(nesArch.ram, nesArch.pc))
     }
 }

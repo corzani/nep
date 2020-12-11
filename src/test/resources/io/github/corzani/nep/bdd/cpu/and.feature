@@ -63,7 +63,7 @@ Feature: AND Opcodes
     And CPU should have performed 4 cycles
 
   Scenario: AND (0x21) Idirect, X
-    Given ROM memory "0x21 0xC0 0x01"
+    Given ROM memory "0x21 0xC0"
     And Accumulator register is 0x8D
     And 0x8B is stored at address 0x01C0
     When code is executed
@@ -73,7 +73,7 @@ Feature: AND Opcodes
     And CPU should have performed 6 cycles
 
   Scenario: AND (0x31) Idirect,Y
-    Given ROM memory "0x31 0xC0 0x01"
+    Given ROM memory "0x31 0xC0"
     And Accumulator register is 0x8D
     And Y register is 0xF2
     And 0x8B is stored at address 0x00C0
