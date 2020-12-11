@@ -1,47 +1,5 @@
 package io.github.corzani.nep
 
-const val RAM_SIZE = 1024 * 64
-const val CARTRIDGE_ROM_ADDRESS = 0x8000
-
-fun initRam(ram: Ram) {
-    write16(ram, 0xFFFCu, 0x8000u)
-}
-
-fun NesArch.initRam() {
-    write16(ram, 0xFFFCu, 0x8000u)
-}
-
-class NesArch(
-    val ram: Ram = Ram(RAM_SIZE).apply(::initRam),
-    var accumulator: U8 = 0x00u,
-    var x: U8 = 0x00u,
-    var y: U8 = 0x00u,
-    var stackpointer: U8 = 0x00u,
-    var status: U8 = 0x00u,
-    val cartSize: Int = 0,
-    var pc: U16 = read16(ram, 0xFFFCu),
-    var cycles: Int = 0
-)
-
-fun NesArch.incrementPcBy(value: Int) {
-    pc = u16(pc + u16(value))
-}
-
-fun createNes(block: NesArch.() -> Unit) = block(NesArch())
-
-@JvmName("testFn")
-fun test(nesArch: NesArch) =
-    testLoop(nesArch, instructionHandler(nesArch), u16(CARTRIDGE_ROM_ADDRESS + nesArch.cartSize))
-
-fun NesArch.test() = testLoop(this, instructionHandler(this), u16(CARTRIDGE_ROM_ADDRESS + this.cartSize))
-
-// TODO Silly Implementation
-fun loadFromMemory(program: Program): NesArch = NesArch(cartSize = program.size).also { nesArch ->
-    program.forEachIndexed { index, uByte ->
-        nesArch.ram[index + CARTRIDGE_ROM_ADDRESS] = uByte
-    }
-}
-
 fun runAll(nesArch: NesArch) = mainLoop(nesArch, instructionHandler(nesArch))
 
 fun NesArch.start() = mainLoop(this, instructionHandler(this))
@@ -67,6 +25,7 @@ fun instructionHandler(nesArch: NesArch) =
         val currentInstruction = opcodes[opcode.toInt()]
         ++nesArch.pc
         currentInstruction.instruction(nesArch) + currentInstruction.cycles
+
     }
 
 data class Op(val name: String, val instruction: (NesArch) -> Int, val cycles: Int)

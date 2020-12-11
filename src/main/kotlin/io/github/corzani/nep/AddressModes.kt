@@ -1,5 +1,19 @@
 package io.github.corzani.nep
 
+sealed class AddressMode(val name: String, val fn: AddressModeFn)
+object Immediate : AddressMode("Immediate", ::immediate)
+object Implied : AddressMode("Implied", ::implied)
+object Relative : AddressMode("Relative", ::relative)
+object Indirect : AddressMode("Indirect", ::indirect)
+object Absolute : AddressMode("Absolute", ::absolute)
+object AbsoluteX : AddressMode("Absolute X", ::absoluteX)
+object AbsoluteY : AddressMode("Absolute Y", ::absoluteY)
+object ZeroPage : AddressMode("ZeroPage", ::zeroPage)
+object ZeroPageX : AddressMode("ZeroPage X", ::zeroPageX)
+object ZeroPageY : AddressMode("ZeroPage Y", ::zeroPageY)
+object IndirectX : AddressMode("Indirect X", ::indirectX)
+object IndirectY : AddressMode("Indirect Y", ::indirectY)
+
 fun zeroFlag(status: U8, reg: U8): U8 =
     retrieveFlag(status, Flag.Z, reg.toInt() == 0)
 

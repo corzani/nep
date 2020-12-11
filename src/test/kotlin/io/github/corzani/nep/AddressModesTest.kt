@@ -1,7 +1,6 @@
 package io.github.corzani.nep
 
-import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
+import kotlin.test.Test
 
 internal class AddressModesTest {
 
@@ -29,16 +28,14 @@ internal class AddressModesTest {
         val lo: U8 = 0xF0u
         val expectedAddress = fromLoHi(lo = lo, hi = hi)
 
-        memoryOf(lo, hi)
-            .let(::loadFromMemory)
-            .run {
-                x = regX
-                y = regY
+        loadFromMemory(mem(lo, hi)) {
+            x = regX
+            y = regY
 
-                assertEquals(expectedAddress, absolute(this))
-                assertEquals(u16(expectedAddress + regX), absoluteX(this))
-                assertEquals(u16(expectedAddress + regY), absoluteY(this))
-            }
+            assertMemoryEquals(expectedAddress, absolute(this).fetched)
+            assertMemoryEquals(u16(expectedAddress + regX), absoluteX(this).fetched)
+            assertMemoryEquals(u16(expectedAddress + regY), absoluteY(this).fetched)
+        }
     }
 
     @Test
@@ -47,16 +44,14 @@ internal class AddressModesTest {
         val regY: U8 = 0xABu
         val expectedAddress: U8 = 0xF0u
 
-        memoryOf(expectedAddress)
-            .let(::loadFromMemory)
-            .run {
-                x = regX
-                y = regY
+        loadFromMemory(mem(expectedAddress)) {
+            x = regX
+            y = regY
 
-                assertEquals(u16(expectedAddress), zeroPage(this))
-                assertEquals(u16(expectedAddress + regX), zeroPageX(this))
-                assertEquals(u16(expectedAddress + regY), zeroPageY(this))
-            }
+            assertMemoryEquals(u16(expectedAddress), zeroPage(this).fetched)
+            assertMemoryEquals(u16(expectedAddress + regX), zeroPageX(this).fetched)
+            assertMemoryEquals(u16(expectedAddress + regY), zeroPageY(this).fetched)
+        }
     }
 
     @Test
@@ -68,16 +63,14 @@ internal class AddressModesTest {
         val expectedAddressIndirectX = { reg: U8 -> fromLoHi(lo = u8(lo + reg), hi = hi) }
         val memory: U16 = fromLoHi(lo, hi)
 
-        memoryOf(lo, hi)
-            .let(::loadFromMemory)
-            .run {
-                x = regX
-                y = regY
+        loadFromMemory(mem(lo, hi)) {
+            x = regX
+            y = regY
 
-                write16(u16(lo), memory)
+            write16(u16(lo), memory)
 
-                assertEquals(expectedAddressIndirectX(regX), indirectX(this))
-                assertEquals(u16(memory + regY), indirectY(this))
-            }
+            assertMemoryEquals(expectedAddressIndirectX(regX), indirectX(this).fetched)
+            assertMemoryEquals(u16(memory + regY), indirectY(this).fetched)
+        }
     }
 }

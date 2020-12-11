@@ -63,7 +63,7 @@ class BddRules : En {
         Given("ROM memory {string}") { str: String ->
             val mem = str.split(' ').map { Integer.decode(it).toUByte() }.toUByteArray()
 
-            lastInstance = memoryOf(*mem).let(::loadFromMemory)
+            lastInstance = mem(*mem).let(::loadFromMemory)
         }
 
         And("{register} register is {binOrHex}") { register: Register, num: Int ->

@@ -2,7 +2,7 @@ package io.github.corzani.nep
 
 fun adc(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 fun and(addressMode: AddressMode) = { nesArch: NesArch ->
-    val (fetched, pageCrossed) = addressMode(nesArch)
+    val (fetched, pageCrossed) = addressMode.fn(nesArch)
 
     read(nesArch.ram, fetched).let { address ->
         nesArch.accumulator = nesArch.accumulator and address
@@ -40,7 +40,7 @@ fun jmp(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 fun jsr(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 
 fun lda(addressMode: AddressMode) = { nesArch: NesArch ->
-    val (fetched, pageCrossed) = addressMode(nesArch)
+    val (fetched, pageCrossed) = addressMode.fn(nesArch)
 
     read(nesArch.ram, fetched).let { data -> nesArch.accumulator = data }
     nesArch.status = flagsOf(nesArch.status, nesArch.accumulator, ::zeroFlag, ::negativeFlag)
@@ -66,7 +66,7 @@ fun sed(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 fun sei(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 
 fun sta(addressMode: AddressMode) = { nesArch: NesArch ->
-    val (fetched, pageCrossed) = addressMode(nesArch)
+    val (fetched, pageCrossed) = addressMode.fn(nesArch)
 
     write(nesArch.ram, fetched, nesArch.accumulator)
     0

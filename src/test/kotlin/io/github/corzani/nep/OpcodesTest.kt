@@ -11,7 +11,7 @@ internal class OpcodesTest {
     }
 
     @Test
-    fun `AND`() = memoryOf(0x29u, 0b10101010u)
+    fun `AND`() = mem(0x29u, 0b10101010u)
         .let(::loadFromMemory)
         .run {
             accumulator = 0b10001101u
@@ -130,7 +130,7 @@ internal class OpcodesTest {
     }
 
     @Test
-    fun `LDA from memory`() = memoryOf(0xa5u, 0x10u, 0x00u)
+    fun `LDA from memory`() = mem(0xa5u, 0x10u, 0x00u)
         .let(::loadFromMemory)
         .run {
             write(0x10u, 0xF5u)

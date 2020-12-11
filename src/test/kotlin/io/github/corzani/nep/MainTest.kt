@@ -36,8 +36,8 @@ class MainTest {
 
     @Test
     fun `Write 16 Bit Unsigned Short Int to Ram`() {
-        val ram = memoryOf(0xABu, 0xB6u, 0x23u, 0xE3u, 0x45u)
-        val expectedRam = memoryOf(0xABu, 0xB6u, 0x12u, 0xF0u, 0x45u)
+        val ram = mem(0xABu, 0xB6u, 0x23u, 0xE3u, 0x45u)
+        val expectedRam = mem(0xABu, 0xB6u, 0x12u, 0xF0u, 0x45u)
 
         write16(ram, 2u, 0xF012u)
         assertEquals(expectedRam.toList(), ram.toList())
