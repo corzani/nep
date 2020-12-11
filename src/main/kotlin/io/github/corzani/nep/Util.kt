@@ -4,7 +4,8 @@ typealias Ram = UByteArray
 typealias Program = UByteArray
 typealias U8 = UByte
 typealias U16 = UShort
-typealias AddressMode = (NesArch) -> U16
+typealias AddressMode = (NesArch) -> Address
+typealias Instruction = (opcode: U8) -> Int
 
 fun u8(value: UInt) = value.toUByte()
 fun u8(value: Int) = value.toUByte()
@@ -16,6 +17,7 @@ fun u16(value: U8) = value.toUShort()
 fun memoryOf(vararg bytes: U8) = ubyteArrayOf(*bytes)
 
 data class U16Split(val lo: U8, val hi: U8)
+data class Address(val fetched: U16, val pageCrossed: Boolean, val length: Int)
 
 fun read(ram: Ram, address: U16): U8 = ram[address.toInt()]
 fun NesArch.read(address: U16): U8 = read(ram, address)

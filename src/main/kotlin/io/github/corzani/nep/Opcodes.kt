@@ -1,79 +1,88 @@
 package io.github.corzani.nep
 
-fun adc(addressMode: AddressMode) = { nesArch: NesArch -> }
+fun adc(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 fun and(addressMode: AddressMode) = { nesArch: NesArch ->
-    val computedAddr = addressMode(nesArch)
-    read(nesArch.ram, computedAddr).let { address ->
+    val (fetched, pageCrossed) = addressMode(nesArch)
+
+    read(nesArch.ram, fetched).let { address ->
         nesArch.accumulator = nesArch.accumulator and address
         nesArch.status = flagsOf(nesArch.status, nesArch.accumulator, ::zeroFlag, ::negativeFlag)
     }
+    0
 }
 
-fun asl(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun bcc(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun bcs(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun beq(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun bit(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun bmi(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun bne(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun bpl(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun brk(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun bvc(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun bvs(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun clc(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun cld(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun cli(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun clv(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun cmp(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun cpx(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun cpy(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun dec(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun dex(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun dey(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun eor(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun inc(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun inx(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun iny(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun jmp(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun jsr(addressMode: AddressMode) = { nesArch: NesArch -> }
+fun asl(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun bcc(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun bcs(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun beq(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun bit(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun bmi(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun bne(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun bpl(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun brk(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun bvc(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun bvs(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun clc(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun cld(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun cli(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun clv(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun cmp(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun cpx(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun cpy(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun dec(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun dex(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun dey(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun eor(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun inc(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun inx(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun iny(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun jmp(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun jsr(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 
 fun lda(addressMode: AddressMode) = { nesArch: NesArch ->
-    read(nesArch.ram, addressMode(nesArch)).let { data -> nesArch.accumulator = data }
+    val (fetched, pageCrossed) = addressMode(nesArch)
+
+    read(nesArch.ram, fetched).let { data -> nesArch.accumulator = data }
     nesArch.status = flagsOf(nesArch.status, nesArch.accumulator, ::zeroFlag, ::negativeFlag)
+    0
 }
 
-fun ldx(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun ldy(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun lsr(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun nop(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun ora(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun pha(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun php(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun pla(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun plp(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun rol(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun ror(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun rti(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun rts(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun sbc(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun sec(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun sed(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun sei(addressMode: AddressMode) = { nesArch: NesArch -> }
+fun ldx(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun ldy(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun lsr(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun nop(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun ora(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun pha(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun php(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun pla(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun plp(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun rol(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun ror(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun rti(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun rts(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun sbc(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun sec(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun sed(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun sei(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 
 fun sta(addressMode: AddressMode) = { nesArch: NesArch ->
-    write(nesArch.ram, addressMode(nesArch), nesArch.accumulator)
+    val (fetched, pageCrossed) = addressMode(nesArch)
+
+    write(nesArch.ram, fetched, nesArch.accumulator)
+    0
 }
 
-fun stx(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun sty(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun tsx(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun tay(addressMode: AddressMode) = { nesArch: NesArch -> }
+fun stx(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun sty(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun tsx(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun tay(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 fun tax(addressMode: AddressMode) = { nesArch: NesArch ->
     nesArch.x = nesArch.accumulator
     nesArch.status = flagsOf(nesArch.status, nesArch.x, ::zeroFlag, ::negativeFlag)
+    0
 }
 
-fun txa(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun txs(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun tya(addressMode: AddressMode) = { nesArch: NesArch -> }
-fun xxx(addressMode: AddressMode) = { nesArch: NesArch -> }
+fun txa(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun txs(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun tya(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun xxx(addressMode: AddressMode) = { nesArch: NesArch -> 0 }

@@ -11,7 +11,7 @@ fun NesArch.initRam() {
     write16(ram, 0xFFFCu, 0x8000u)
 }
 
-data class NesArch(
+class NesArch(
     val ram: Ram = Ram(RAM_SIZE).apply(::initRam),
     var accumulator: U8 = 0x00u,
     var x: U8 = 0x00u,
@@ -19,8 +19,13 @@ data class NesArch(
     var stackpointer: U8 = 0x00u,
     var status: U8 = 0x00u,
     val cartSize: Int = 0,
-    var pc: U16 = read16(ram, 0xFFFCu)
+    var pc: U16 = read16(ram, 0xFFFCu),
+    var cycles: Int = 0
 )
+
+fun NesArch.incrementPcBy(value: Int) {
+    pc = u16(pc + u16(value))
+}
 
 fun createNes(block: NesArch.() -> Unit) = block(NesArch())
 
@@ -41,26 +46,31 @@ fun runAll(nesArch: NesArch) = mainLoop(nesArch, instructionHandler(nesArch))
 
 fun NesArch.start() = mainLoop(this, instructionHandler(this))
 
-tailrec fun mainLoop(nesArch: NesArch, runInstruction: (opcode: U8) -> Unit) {
+tailrec fun mainLoop(nesArch: NesArch, runInstruction: Instruction) {
     runInstruction(read(nesArch.ram, nesArch.pc))
     mainLoop(nesArch, runInstruction)
 }
 
 fun testLoop(
     nesArch: NesArch,
-    runInstruction: (opcode: U8) -> Unit,
+    runInstruction: Instruction,
     runUntilPC: U16
 ) {
     while (nesArch.pc < runUntilPC) {
-        runInstruction(read(nesArch.ram, nesArch.pc))
+        println(nesArch.pc.toInt())
+        nesArch.cycles += runInstruction(read(nesArch.ram, nesArch.pc))
     }
 }
 
 // TODO toInt shouldn't be here
 fun instructionHandler(nesArch: NesArch) =
-    { opcode: U8 -> opcodes[opcode.toInt()].also { ++nesArch.pc }.istruction(nesArch) }
+    { opcode: U8 ->
+        val currentInstruction = opcodes[opcode.toInt()]
+        ++nesArch.pc
+        currentInstruction.instruction(nesArch) + currentInstruction.cycles
+    }
 
-data class Op(val name: String, val istruction: (NesArch) -> Unit, val cycles: Int)
+data class Op(val name: String, val instruction: (NesArch) -> Int, val cycles: Int)
 
 fun statusWith(vararg flags: Flag): U8 = flags.fold(u8(0)) { acc, flag -> acc or flag.bitMask }
 
@@ -90,8 +100,4 @@ fun retrieveFlag(status: U8, flag: Flag, value: Boolean = true) = when (value) {
 
 fun setFlag(nesArch: NesArch, flag: Flag, value: Boolean) = nesArch.apply {
     status = retrieveFlag(status, flag)
-}
-
-fun main(args: Array<String>) {
-
 }
