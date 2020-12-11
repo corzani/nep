@@ -19,6 +19,12 @@ fun NesArch.initRam() {
     write16(ram, 0xFFFCu, 0x8000u)
 }
 
+// TODO idea? Or maybe not
+
+//fun NesArch.fetch(fn: (NesArch, Address.() -> Unit) -> Unit) = fn(this) {
+//
+//}
+
 fun NesArch.incrementPcBy(value: Int) {
     pc = u16(pc + u16(value))
 }

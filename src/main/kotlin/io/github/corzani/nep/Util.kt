@@ -4,7 +4,7 @@ typealias Ram = UByteArray
 typealias Program = UByteArray
 typealias U8 = UByte
 typealias U16 = UShort
-typealias AddressModeFn = (NesArch) -> Address
+typealias AddressModeFn = (nesArch: NesArch, fn: Address.() -> Unit) -> Address
 typealias Instruction = (opcode: U8) -> Int
 
 fun u8(value: UInt) = value.toUByte()

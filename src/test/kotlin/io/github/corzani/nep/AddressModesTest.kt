@@ -28,13 +28,19 @@ internal class AddressModesTest {
         val lo: U8 = 0xF0u
         val expectedAddress = fromLoHi(lo = lo, hi = hi)
 
-        loadFromMemory(mem(lo, hi)) {
+        loadFromMemory(mem(lo, hi, lo, hi, lo, hi)) {
             x = regX
             y = regY
 
-            assertMemoryEquals(expectedAddress, absolute(this).fetched)
-            assertMemoryEquals(u16(expectedAddress + regX), absoluteX(this).fetched)
-            assertMemoryEquals(u16(expectedAddress + regY), absoluteY(this).fetched)
+            absolute(this) {
+                assertMemoryEquals(expectedAddress, fetched)
+            }
+            absoluteX(this) {
+                assertMemoryEquals(u16(expectedAddress + regX), fetched)
+            }
+            absoluteY(this) {
+                assertMemoryEquals(u16(expectedAddress + regY), fetched)
+            }
         }
     }
 
@@ -44,13 +50,21 @@ internal class AddressModesTest {
         val regY: U8 = 0xABu
         val expectedAddress: U8 = 0xF0u
 
-        loadFromMemory(mem(expectedAddress)) {
+        loadFromMemory(mem(expectedAddress, expectedAddress, expectedAddress)) {
             x = regX
             y = regY
 
-            assertMemoryEquals(u16(expectedAddress), zeroPage(this).fetched)
-            assertMemoryEquals(u16(expectedAddress + regX), zeroPageX(this).fetched)
-            assertMemoryEquals(u16(expectedAddress + regY), zeroPageY(this).fetched)
+            zeroPage(this) {
+                assertMemoryEquals(u16(expectedAddress), fetched)
+            }
+
+            zeroPageX(this) {
+                assertMemoryEquals(u16(expectedAddress + regX), fetched)
+            }
+
+            zeroPageY(this) {
+                assertMemoryEquals(u16(expectedAddress + regY), fetched)
+            }
         }
     }
 
@@ -63,14 +77,19 @@ internal class AddressModesTest {
         val expectedAddressIndirectX = { reg: U8 -> fromLoHi(lo = u8(lo + reg), hi = hi) }
         val memory: U16 = fromLoHi(lo, hi)
 
-        loadFromMemory(mem(lo, hi)) {
+        loadFromMemory(mem(lo, lo)) {
             x = regX
             y = regY
 
             write16(u16(lo), memory)
 
-            assertMemoryEquals(expectedAddressIndirectX(regX), indirectX(this).fetched)
-            assertMemoryEquals(u16(memory + regY), indirectY(this).fetched)
+            indirectX(this) {
+                assertMemoryEquals(expectedAddressIndirectX(regX), fetched)
+            }
+
+            indirectY(this) {
+                assertMemoryEquals(u16(memory + regY), fetched)
+            }
         }
     }
 }
