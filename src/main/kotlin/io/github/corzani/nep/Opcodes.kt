@@ -48,6 +48,7 @@ fun asl(addressMode: AddressMode) = { nesArch: NesArch ->
 fun bcc(addressMode: AddressMode) = { nesArch: NesArch ->
     onFlag(nesArch, Flag.C) {
 
+
     }
     0
 }

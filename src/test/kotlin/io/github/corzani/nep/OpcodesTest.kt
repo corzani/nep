@@ -1,8 +1,6 @@
 package io.github.corzani.nep
 
-import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-
+import kotlin.test.*
 
 internal class OpcodesTest {
 

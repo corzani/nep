@@ -16,6 +16,12 @@ fun u16(value: U8) = value.toUShort()
 
 fun mem(vararg bytes: U8) = ubyteArrayOf(*bytes)
 
+fun incrAddress(address: U16, increment: Byte): U16 =
+    u16(address.toInt() + increment.toInt())
+
+fun toSigned(u8: U8): Byte = u8.toByte()
+
+
 data class U16Split(val lo: U8, val hi: U8)
 data class Address(val fetched: U16, val pageCrossed: Boolean, val length: Int)
 
