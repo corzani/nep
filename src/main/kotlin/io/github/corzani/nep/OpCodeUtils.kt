@@ -12,5 +12,9 @@ fun branch(nesArch: NesArch, address: U16, flag: Flag, cond: Boolean) = onFlag(n
     nesArch.pc = u16(jumpTo)
 }
 
+@JvmName("branchOnFlagFn")
 fun branchOnFlag(nesArch: NesArch, addressMode: AddressMode, flag: Flag, cond: Boolean) =
     addressMode.address(nesArch).let { (fetched) -> branch(nesArch, fetched, flag, cond) }
+
+fun NesArch.branchOnFlag(addressMode: AddressMode, flag: Flag, cond: Boolean) =
+    addressMode.address(this).let { (fetched) -> branch(this, fetched, flag, cond) }

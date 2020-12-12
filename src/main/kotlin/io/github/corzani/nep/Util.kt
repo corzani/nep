@@ -37,6 +37,9 @@ fun U16.splitLoHi(): U16Split = U16Split(lo = (this and 0x00FFu).toUByte(), hi =
 fun U16.lo8(): U8 = (this and 0x00FFu).toUByte()
 fun U16.hi8(): U8 = this.rotateRight(8).toUByte()
 
+fun U16.isBitSet(ind: Int) = (this and u16(1u).rotateLeft(ind)) > 0u
+fun U8.isBitSet(ind: Int) = (this and u8(1u).rotateLeft(ind)) > 0u
+
 fun fromLoHi(lo: U8, hi: U8): U16 = u16(hi).rotateLeft(8) or u16(lo)
 
 fun fromLoHiToU16(u16Split: U16Split): U16 = u16((u16Split.hi)).rotateLeft(8) or u16(u16Split.lo)
@@ -52,9 +55,12 @@ fun write16(ram: Ram, address: U16, data: U16) = data.splitLoHi { lo: U8, hi: U8
 
 fun NesArch.write16(address: U16, data: U16) = write16(ram, address, data)
 
-
 fun write(ram: Ram, address: U16, data: U8) = data.let { ram[address.toInt()] = it }
 fun NesArch.write(address: U16, data: U8) = write(ram, address, data)
 
 fun flagsOf(status: U8, reg: U8, vararg functions: (status: U8, reg: U8) -> U8) =
     functions.fold(status) { acc, fn -> fn(acc, reg) }
+
+fun NesArch.setFlagsFrom(reg: U8, vararg functions: (status: U8, reg: U8) -> U8) {
+    status = flagsOf(status, reg, *functions)
+}

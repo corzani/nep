@@ -37,6 +37,14 @@ class MainTest {
     }
 
     @Test
+    fun `U8 & U16 is bit set`() {
+        assertTrue(u16(0x0001u).isBitSet(0))
+        assertTrue(u8(0b00000001u).isBitSet(0))
+        assertTrue(u16(0x0002u).isBitSet(1))
+        assertTrue(u8(0b00000100u).isBitSet(2))
+    }
+
+    @Test
     fun `Write 16 Bit Unsigned Short Int to Ram`() {
         val ram = mem(0xABu, 0xB6u, 0x23u, 0xE3u, 0x45u)
         val expectedRam = mem(0xABu, 0xB6u, 0x12u, 0xF0u, 0x45u)

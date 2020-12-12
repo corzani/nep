@@ -20,15 +20,14 @@ fun testLoop(
 }
 
 // TODO toInt shouldn't be here
-fun instructionHandler(nesArch: NesArch) =
-    { opcode: U8 ->
-        val currentInstruction = opcodes[opcode.toInt()]
-        ++nesArch.pc
-        currentInstruction.instruction(nesArch) + currentInstruction.cycles
+fun instructionHandler(nesArch: NesArch) = fun(opcode: U8): Int {
+    val currentInstruction = opcodes[opcode.toInt()]
+    ++nesArch.pc
+    // TODO... Check when I have additional cycles
+    return currentInstruction.cycles // + currentInstruction.instruction(nesArch)
+}
 
-    }
-
-data class Op(val name: String, val instruction: (NesArch) -> Int, val cycles: Int)
+data class Op(val name: String, val instruction: (NesArch) -> Boolean, val cycles: Int)
 
 fun statusWith(vararg flags: Flag): U8 = flags.fold(u8(0)) { acc, flag -> acc or flag.bitMask }
 
@@ -62,15 +61,20 @@ fun setFlag(nesArch: NesArch, flag: Flag, value: Boolean) = nesArch.apply {
 }
 
 fun NesArch.setFlag(flag: Flag, value: Boolean) {
-    status = retrieveFlag(status, flag)
+    status = retrieveFlag(status, flag, value)
 }
+
+fun NesArch.setNegativeFlag(cond: Boolean) = setFlag(Flag.N, cond)
+fun NesArch.setOverflowFlag(cond: Boolean) = setFlag(Flag.V, cond)
+fun NesArch.setBreakFlag(cond: Boolean) = setFlag(Flag.B, cond)
+fun NesArch.setDecimalFlag(cond: Boolean) = setFlag(Flag.D, cond)
+fun NesArch.setInterruptFlag(cond: Boolean) = setFlag(Flag.I, cond)
+fun NesArch.setZeroFlag(cond: Boolean) = setFlag(Flag.Z, cond)
+fun NesArch.setCarryFlag(cond: Boolean) = setFlag(Flag.C, cond)
 
 fun getFlag(nesArch: NesArch, flag: Flag): Boolean = nesArch.run {
     status and flag.bitMask > 0u
 }
-
-fun getBit(data: U8, idx: Int) =
-    (data and u8(listOf(0x01u, 0x02u, 0x04u, 0x08u, 0x10u, 0x20u, 0x40u, 0x80u)[idx])).compareTo(0u) == 1
 
 fun onFlag(nesArch: NesArch, flag: Flag, cond: Boolean, block: () -> Unit) =
     when (((nesArch.status and flag.bitMask) > 0u) == cond) {

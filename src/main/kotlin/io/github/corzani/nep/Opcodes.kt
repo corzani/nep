@@ -1,391 +1,324 @@
 package io.github.corzani.nep
 
-fun adc(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        val (fetched) = addressMode.address(this)
-        val sum = u16(fetched + accumulator + (status and 0x80u).rotateLeft(1))
-        val sumLo8 = sum.lo8()
-
-        setFlag(Flag.C, sum > 0xFFu)
-        setFlag(
-            Flag.V,
-            ((u16(accumulator) xor fetched).inv() and (u16(accumulator) xor sum) and 0x0080u) > 0x00u
-        )
-        status = flagsOf(status, sumLo8, ::zeroFlag, ::negativeFlag)
-        accumulator = sumLo8
+fun opImpl(possibleAdditionalCycle: Boolean, block: NesArch.() -> Unit): (NesArch) -> Boolean =
+    fun(nesArch: NesArch): Boolean {
+        block(nesArch)
+        return possibleAdditionalCycle
     }
-    1
+
+fun adc(addressMode: AddressMode) = opImpl(true) {
+    val (fetched) = addressMode.address(this)
+    val sum = u16(fetched + accumulator + (status and 0x80u).rotateLeft(1))
+    val sumLo8 = sum.lo8()
+
+    setCarryFlag(sum > 0xFFu)
+    setOverflowFlag(
+        ((u16(accumulator) xor fetched).inv() and (u16(accumulator) xor sum) and 0x0080u) > 0x00u
+    )
+    setFlagsFrom(sumLo8, ::zeroFlag, ::negativeFlag)
+    accumulator = sumLo8
 }
 
-fun and(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        val (fetched) = addressMode.address(this)
-        read(ram, fetched).let { address ->
-            accumulator = accumulator and address
-            status = flagsOf(status, accumulator, ::zeroFlag, ::negativeFlag)
+fun and(addressMode: AddressMode) = opImpl(false) {
+    val (fetched) = addressMode.address(this)
+    read(fetched).let { address ->
+        accumulator = accumulator and address
+        setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
+    }
+}
+
+fun asl(addressMode: AddressMode) = opImpl(false) {
+
+    fun doShiftLeft(data: U8): U8 {
+        setCarryFlag(data.isBitSet(7))
+        return (data.rotateLeft(1) and 0xFEu).also {
+            setFlagsFrom(it, ::zeroFlag, ::negativeFlag)
         }
     }
-    0
-}
 
-fun asl(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        fun doShiftLeft(data: U8): U8 {
-            setFlag(Flag.C, getBit(data, 7))
-            return (data.rotateLeft(1) and 0xFEu).also {
-                status = flagsOf(status, it, ::zeroFlag, ::negativeFlag)
+    when (addressMode) {
+        Implied -> doShiftLeft(accumulator).also { accumulator = it }
+        else -> {
+            val (fetched) = addressMode.address(this)
+            read(fetched).let(::doShiftLeft).also {
+                write(fetched, it)
             }
         }
-        when (addressMode) {
-            Implied -> doShiftLeft(accumulator).also { accumulator = it }
-            else -> {
-                val (fetched) = addressMode.address(this)
-                read(ram, fetched).let(::doShiftLeft).also {
-                    write(ram, fetched, it)
-                }
-            }
-        }
-        0
     }
 }
 
-fun bcc(addressMode: AddressMode) = { nesArch: NesArch ->
-    branchOnFlag(nesArch, addressMode, Flag.C, false)
-    0
+fun bcc(addressMode: AddressMode) = opImpl(false) {
+    branchOnFlag(addressMode, Flag.C, false)
+
 }
 
-fun bcs(addressMode: AddressMode) = { nesArch: NesArch ->
-    branchOnFlag(nesArch, addressMode, Flag.C, true)
-    0
+fun bcs(addressMode: AddressMode) = opImpl(false) {
+    branchOnFlag(addressMode, Flag.C, true)
+
 }
 
-fun beq(addressMode: AddressMode) = { nesArch: NesArch ->
-    branchOnFlag(nesArch, addressMode, Flag.Z, true)
-    0
+fun beq(addressMode: AddressMode) = opImpl(false) {
+    branchOnFlag(addressMode, Flag.Z, true)
+
 }
 
-fun bit(addressMode: AddressMode) = { nesArch: NesArch ->
-    0
+fun bit(addressMode: AddressMode) = opImpl(false) {
+    TODO()
 }
 
-fun bmi(addressMode: AddressMode) = { nesArch: NesArch ->
-    branchOnFlag(nesArch, addressMode, Flag.N, true)
-    0
+fun bmi(addressMode: AddressMode) = opImpl(false) {
+    branchOnFlag(addressMode, Flag.N, true)
+
 }
 
-fun bne(addressMode: AddressMode) = { nesArch: NesArch ->
-    branchOnFlag(nesArch, addressMode, Flag.C, false)
-    0
+fun bne(addressMode: AddressMode) = opImpl(false) {
+    branchOnFlag(addressMode, Flag.C, false)
+
 }
 
-fun bpl(addressMode: AddressMode) = { nesArch: NesArch ->
-    branchOnFlag(nesArch, addressMode, Flag.N, false)
-    0
+fun bpl(addressMode: AddressMode) = opImpl(false) {
+    branchOnFlag(addressMode, Flag.N, false)
+
 }
 
-fun brk(addressMode: AddressMode) = { nesArch: NesArch ->
-
-    0
+fun brk(addressMode: AddressMode) = opImpl(false) {
 }
 
-fun bvc(addressMode: AddressMode) = { nesArch: NesArch ->
-    branchOnFlag(nesArch, addressMode, Flag.Z, false)
-    0
+fun bvc(addressMode: AddressMode) = opImpl(false) {
+    branchOnFlag(addressMode, Flag.Z, false)
+
 }
 
-fun bvs(addressMode: AddressMode) = { nesArch: NesArch ->
-    branchOnFlag(nesArch, addressMode, Flag.V, true)
-    0
+fun bvs(addressMode: AddressMode) = opImpl(false) {
+    branchOnFlag(addressMode, Flag.V, true)
+
 }
 
-fun clc(addressMode: AddressMode) = { nesArch: NesArch ->
-    setFlag(nesArch, Flag.C, false)
-    0
+fun clc(addressMode: AddressMode) = opImpl(false) {
+    setCarryFlag(false)
+
 }
 
-fun cld(addressMode: AddressMode) = { nesArch: NesArch ->
-    setFlag(nesArch, Flag.D, false)
-    0
+fun cld(addressMode: AddressMode) = opImpl(false) {
+    setDecimalFlag(false)
 }
 
-fun cli(addressMode: AddressMode) = { nesArch: NesArch ->
-
-    setFlag(nesArch, Flag.I, false)
-    0
+fun cli(addressMode: AddressMode) = opImpl(false) {
+    setInterruptFlag(false)
 }
 
-fun clv(addressMode: AddressMode) = { nesArch: NesArch ->
-    setFlag(nesArch, Flag.V, false)
-    0
+fun clv(addressMode: AddressMode) = opImpl(false) {
+    setOverflowFlag(false)
+
 }
 
-fun cmp(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun cpx(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun cpy(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun dec(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun dex(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun dey(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun eor(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun inc(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun inx(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun iny(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun jmp(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun jsr(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun cmp(addressMode: AddressMode) = opImpl(false) { }
+fun cpx(addressMode: AddressMode) = opImpl(false) { }
+fun cpy(addressMode: AddressMode) = opImpl(false) { }
+fun dec(addressMode: AddressMode) = opImpl(false) { }
+fun dex(addressMode: AddressMode) = opImpl(false) { }
+fun dey(addressMode: AddressMode) = opImpl(false) { }
+fun eor(addressMode: AddressMode) = opImpl(false) { }
+fun inc(addressMode: AddressMode) = opImpl(false) { }
+fun inx(addressMode: AddressMode) = opImpl(false) { }
+fun iny(addressMode: AddressMode) = opImpl(false) { }
+fun jmp(addressMode: AddressMode) = opImpl(false) { }
+fun jsr(addressMode: AddressMode) = opImpl(false) { }
 
-fun lda(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        val (fetched) = addressMode.address(this)
-        read(ram, fetched).let { data -> accumulator = data }
-        status = flagsOf(status, accumulator, ::zeroFlag, ::negativeFlag)
-    }
-    0
+fun lda(addressMode: AddressMode) = opImpl(false) {
+    val (fetched) = addressMode.address(this)
+    read(fetched).let { data -> accumulator = data }
+    setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
 }
 
-fun ldx(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        val (fetched) = addressMode.address(this)
-        x = read(ram, fetched)
-        status = flagsOf(status, x, ::zeroFlag, ::negativeFlag)
-    }
-    1
+fun ldx(addressMode: AddressMode) = opImpl(true) {
+    val (fetched) = addressMode.address(this)
+    x = read(fetched)
+    setFlagsFrom(x, ::zeroFlag, ::negativeFlag)
 }
 
-fun ldy(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        val (fetched) = addressMode.address(this)
-        y = read(ram, fetched)
-        status = flagsOf(status, y, ::zeroFlag, ::negativeFlag)
-    }
-    1
+fun ldy(addressMode: AddressMode) = opImpl(true) {
+    val (fetched) = addressMode.address(this)
+    y = read(fetched)
+    setFlagsFrom(y, ::zeroFlag, ::negativeFlag)
 }
 
 
 // TODO Check carefully, very carefully
-fun lsr(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        val (fetched) = addressMode.address(this)
-        setFlag(Flag.C, (fetched and 0x0001u).lo8() > 0u)
-        val temp = fetched.rotateLeft(1) and 0x7Fu
-        setFlag(Flag.Z, temp.lo8() == u8(0x00u))
-        setFlag(Flag.N, (temp.lo8() and 0x80u) > u8(0))
+fun lsr(addressMode: AddressMode) = opImpl(false) {
 
-        when (addressMode) {
-            Immediate -> {
-                accumulator = temp.lo8()
-            }
-            else -> write(fetched, temp.lo8())
-        }
-    }
-    0
-}
+    val (fetched) = addressMode.address(this)
+    setCarryFlag(fetched.isBitSet(0))
+    val temp = fetched.rotateLeft(1) and 0x7Fu
+    setZeroFlag(temp.lo8() == u8(0x00u))
+    setNegativeFlag(temp.lo8().isBitSet(7))
 
-fun nop(addressMode: AddressMode) = { _: NesArch ->
     when (addressMode) {
-        Implied -> 1
-        else -> 0
-    }
-}
-
-fun ora(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        val (fetched) = addressMode.address(this)
-        val temp = read(ram, fetched)
-        accumulator = accumulator or temp
-        status = flagsOf(status, accumulator, ::zeroFlag, ::negativeFlag)
-    }
-    1
-}
-
-fun pha(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        write(ram, u16(0x0100u + stackpointer), accumulator)
-            .also {
-                --stackpointer
-            }
-        0
-    }
-}
-
-fun php(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        write(ram, u16(0x0100u + stackpointer), status or Flag.B.bitMask or Flag.U.bitMask)
-            .also {
-                setFlag(Flag.B, false)
-                setFlag(Flag.U, false)
-                --stackpointer
-            }
-        0
-    }
-}
-
-fun pla(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        ++stackpointer
-        accumulator = read(ram, u16(0x0100u + stackpointer))
-        status = flagsOf(status, accumulator, ::zeroFlag, ::negativeFlag)
-        0
-    }
-}
-
-fun plp(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        ++stackpointer
-        status = read(ram, u16(0x0100u + stackpointer))
-        setFlag(Flag.U, true)
-    }
-    0
-}
-
-fun rol(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        val (fetched) = addressMode.address(this)
-        val temp = (u16(read(ram, fetched)).rotateLeft(1) or 0xFEu) or u16(Flag.C.bitMask)
-        setFlag(Flag.C, temp.hi8() > 0u)
-        setFlag(Flag.Z, temp.lo8() == u8(0u))
-        setFlag(Flag.N, (temp and 0x0080u) > 0u)
-
-        when (addressMode) {
-            Implied -> {
-                accumulator = temp.lo8()
-            }
-            else -> write(ram, fetched, temp.lo8())
+        Immediate -> {
+            accumulator = temp.lo8()
         }
+        else -> write(fetched, temp.lo8())
     }
-    0
+
+}
+
+fun nop(addressMode: AddressMode) = when (addressMode) {
+    Implied -> opImpl(true) {}
+    else -> opImpl(false) {}
+}
+
+
+fun ora(addressMode: AddressMode) = opImpl(true) {
+    val (fetched) = addressMode.address(this)
+    val temp = read(fetched)
+    accumulator = accumulator or temp
+    setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
+
+}
+
+fun pha(addressMode: AddressMode) = opImpl(false) {
+    write(u16(0x0100u + stackpointer), accumulator).also { --stackpointer }
+}
+
+fun php(addressMode: AddressMode) = opImpl(false) {
+    write(u16(0x0100u + stackpointer), status or Flag.B.bitMask or Flag.U.bitMask)
+        .also {
+            setBreakFlag(false)
+            setFlag(Flag.U, false)
+            --stackpointer
+        }
+}
+
+fun pla(addressMode: AddressMode) = opImpl(false) {
+    ++stackpointer
+    accumulator = read(u16(0x0100u + stackpointer))
+    setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
+}
+
+fun plp(addressMode: AddressMode) = opImpl(false) {
+    ++stackpointer
+    status = read(u16(0x0100u + stackpointer))
+    setFlag(Flag.U, true)
+}
+
+fun rol(addressMode: AddressMode) = opImpl(false) {
+    val (fetched) = addressMode.address(this)
+    val temp = (u16(read(fetched)).rotateLeft(1) or 0xFEu) or u16(Flag.C.bitMask)
+    setCarryFlag(temp.hi8() > 0u)
+    setZeroFlag(temp.lo8() == u8(0u))
+    setNegativeFlag(temp.isBitSet(7))
+
+    when (addressMode) {
+        Implied -> {
+            accumulator = temp.lo8()
+        }
+        else -> write(fetched, temp.lo8())
+    }
 }
 
 // TODO Finish him!
-fun ror(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        val (fetched) = addressMode.address(this)
-        val temp = (u16(read(ram, fetched)).rotateLeft(1) or 0xFEu) or u16(Flag.C.bitMask)
-        temp.lo8().let {
-            setFlag(Flag.C, fetched and u16(Flag.C.bitMask) > 0u)
-            setFlag(Flag.Z, it == u8(0u))
-            setFlag(Flag.N, (temp and 0x80u) > 0u)
+fun ror(addressMode: AddressMode) = opImpl(false) {
 
-            when (addressMode) {
-                Implied -> {
-                    accumulator = temp.lo8()
-                }
-                else -> write(ram, fetched, temp.lo8())
-            }
+    val (fetched) = addressMode.address(this)
+    val temp = (u16(read(fetched)).rotateLeft(1) or 0xFEu) or u16(Flag.C.bitMask)
 
+    setCarryFlag(fetched and u16(Flag.C.bitMask) > 0u)
+    setZeroFlag(temp.lo8() == u8(0u))
+    setNegativeFlag(temp.isBitSet(7))
+
+    when (addressMode) {
+        Implied -> {
+            accumulator = temp.lo8()
         }
-    }
-    0
-}
-
-fun rti(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun rts(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-
-fun sbc(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        val (fetched) = addressMode.address(this)
-        val value: U16 = fetched xor 0x00FFu
-        val temp: U16 = u16(value + accumulator + (status and 0x80u).rotateLeft(1))
-        val tempLo8 = temp.lo8()
-
-        setFlag(Flag.C, temp > 0xFFu)
-        setFlag(
-            Flag.V,
-            ((u16(accumulator) xor temp) and (temp xor value) and 0x0080u) > 0x00u
-        )
-        status = flagsOf(status, tempLo8, ::zeroFlag, ::negativeFlag)
-        accumulator = tempLo8
-    }
-    1
-}
-
-fun sec(addressMode: AddressMode) = { nesArch: NesArch ->
-    setFlag(nesArch, Flag.C, true)
-    0
-}
-
-fun sed(addressMode: AddressMode) = { nesArch: NesArch ->
-    setFlag(nesArch, Flag.D, true)
-    0
-}
-
-fun sei(addressMode: AddressMode) = { nesArch: NesArch ->
-    setFlag(nesArch, Flag.I, true)
-    0
-}
-
-fun sta(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        val (fetched) = addressMode.address(this)
-        write(ram, fetched, accumulator)
-    }
-    0
-}
-
-fun stx(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        val (fetched) = addressMode.address(this)
-        write(ram, fetched, x)
-    }
-    0
-}
-
-fun sty(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        val (fetched) = addressMode.address(this)
-        write(ram, fetched, y)
-    }
-    0
-}
-
-fun tsx(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        x = stackpointer
-        status = flagsOf(status, x, ::zeroFlag, ::negativeFlag)
-        0
+        else -> write(fetched, temp.lo8())
     }
 }
 
-//fun opcodeImp(block: NesArch.() -> Int): (NesArch) -> Int = fun(nesArch: NesArch): Int = block(nesArch)
-//
-//fun opimpl(addressMode:AddressMode) = opcodeImp {
-//
-//    0
-//}
+fun rti(addressMode: AddressMode) = opImpl(false) { 0 }
+fun rts(addressMode: AddressMode) = opImpl(false) { 0 }
 
-fun tay(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        y = accumulator
-        status = flagsOf(status, y, ::zeroFlag, ::negativeFlag)
-        0
-    }
+fun sbc(addressMode: AddressMode) = opImpl(true) {
+
+    val (fetched) = addressMode.address(this)
+    val value: U16 = fetched xor 0x00FFu
+    val temp: U16 = u16(value + accumulator + (status and 0x80u).rotateLeft(1))
+    val tempLo8 = temp.lo8()
+
+    setCarryFlag(temp > 0xFFu)
+    setOverflowFlag(
+        ((u16(accumulator) xor temp) and (temp xor value) and 0x0080u) > 0x00u
+    )
+    setFlagsFrom(tempLo8, ::zeroFlag, ::negativeFlag)
+    accumulator = tempLo8
 }
 
-fun tax(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        x = accumulator
-        status = flagsOf(status, x, ::zeroFlag, ::negativeFlag)
-    }
-    0
+fun sec(addressMode: AddressMode) = opImpl(false) {
+    setCarryFlag(true)
+
 }
 
-fun txa(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        accumulator = x
-        status = flagsOf(status, accumulator, ::zeroFlag, ::negativeFlag)
-    }
-    0
+fun sed(addressMode: AddressMode) = opImpl(false) {
+    setDecimalFlag(true)
+
+}
+
+fun sei(addressMode: AddressMode) = opImpl(false) {
+    setInterruptFlag(true)
+
+}
+
+fun sta(addressMode: AddressMode) = opImpl(false) {
+
+    val (fetched) = addressMode.address(this)
+    write(fetched, accumulator)
+
+
+}
+
+fun stx(addressMode: AddressMode) = opImpl(false) {
+
+    val (fetched) = addressMode.address(this)
+    write(fetched, x)
+
+
+}
+
+fun sty(addressMode: AddressMode) = opImpl(false) {
+
+    val (fetched) = addressMode.address(this)
+    write(fetched, y)
+
+}
+
+fun tsx(addressMode: AddressMode) = opImpl(false) {
+
+    x = stackpointer
+    setFlagsFrom(x, ::zeroFlag, ::negativeFlag)
+}
+
+fun tay(addressMode: AddressMode) = opImpl(false) {
+    y = accumulator
+    setFlagsFrom(y, ::zeroFlag, ::negativeFlag)
+}
+
+
+fun tax(addressMode: AddressMode) = opImpl(false) {
+    x = accumulator
+    setFlagsFrom(x, ::zeroFlag, ::negativeFlag)
+}
+
+fun txa(addressMode: AddressMode) = opImpl(false) {
+    accumulator = x
+    setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
 }
 
 // TODO
-fun txs(addressMode: AddressMode) = { nesArch: NesArch ->
-    0
+fun txs(addressMode: AddressMode) = opImpl(false) {
 }
 
-fun tya(addressMode: AddressMode) = { nesArch: NesArch ->
-    nesArch.run {
-        accumulator = y
-        status = flagsOf(status, accumulator, ::zeroFlag, ::negativeFlag)
-    }
-    0
+fun tya(addressMode: AddressMode) = opImpl(false) {
+    accumulator = y
+    setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
 }
 
-fun xxx(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun xxx(addressMode: AddressMode) = opImpl(false) { }
