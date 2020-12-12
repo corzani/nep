@@ -1,7 +1,9 @@
 package io.github.corzani.nep
 
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class MainTest {
 
@@ -43,5 +45,10 @@ class MainTest {
         assertEquals(expectedRam.toList(), ram.toList())
     }
 
+    @Test
+    fun getB() {
+        assertFalse(getBit(0b10000000u, 0))
+        assertTrue(getBit(0b10000000u, 7))
+    }
 
 }

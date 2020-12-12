@@ -29,6 +29,8 @@ fun NesArch.read16(address: U16): U16 = read16(ram, address)
 
 // TODO Fix toUByte
 fun U16.splitLoHi(): U16Split = U16Split(lo = (this and 0x00FFu).toUByte(), hi = this.rotateRight(8).toUByte())
+fun U16.lo8(): U8 = (this and 0x00FFu).toUByte()
+fun U16.hi8(): U8 = this.rotateRight(8).toUByte()
 
 fun fromLoHi(lo: U8, hi: U8): U16 = u16(hi).rotateLeft(8) or u16(lo)
 

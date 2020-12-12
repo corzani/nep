@@ -1,19 +1,57 @@
 package io.github.corzani.nep
 
-fun adc(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun adc(addressMode: AddressMode) = { nesArch: NesArch ->
+    addressMode.address(nesArch) {
+        val sum = u16(fetched + nesArch.accumulator + (nesArch.status and 0x80u).rotateLeft(1))
+        val sumLo8 = sum.lo8()
+
+        setFlag(nesArch, Flag.C, sum > 0xFFu)
+        setFlag(
+            nesArch,
+            Flag.V,
+            ((u16(nesArch.accumulator) xor fetched).inv() and (u16(nesArch.accumulator) xor sum) and 0x0080u) > 0x00u
+        )
+        nesArch.status = flagsOf(nesArch.status, sumLo8, ::zeroFlag, ::negativeFlag)
+        nesArch.accumulator = sumLo8
+    }
+    1
+}
+
 fun and(addressMode: AddressMode) = { nesArch: NesArch ->
     addressMode.address(nesArch) {
         read(nesArch.ram, fetched).let { address ->
             nesArch.accumulator = nesArch.accumulator and address
             nesArch.status = flagsOf(nesArch.status, nesArch.accumulator, ::zeroFlag, ::negativeFlag)
         }
-        0
     }
     0
 }
 
-fun asl(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun bcc(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+fun asl(addressMode: AddressMode) = { nesArch: NesArch ->
+    fun doShiftLeft(data: U8): U8 {
+        setFlag(nesArch, Flag.C, getBit(data, 7))
+        return (data.rotateLeft(1) and 0xFEu).also {
+            nesArch.status = flagsOf(nesArch.status, it, ::zeroFlag, ::negativeFlag)
+        }
+    }
+    when (addressMode) {
+        Implied -> doShiftLeft(nesArch.accumulator).also { nesArch.accumulator = it }
+        else -> addressMode.address(nesArch) {
+            read(nesArch.ram, fetched).let(::doShiftLeft).also {
+                write(nesArch.ram, fetched, it)
+            }
+        }
+    }
+    0
+}
+
+fun bcc(addressMode: AddressMode) = { nesArch: NesArch ->
+    onFlag(nesArch, Flag.C) {
+
+    }
+    0
+}
+
 fun bcs(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 fun beq(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 fun bit(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
@@ -61,7 +99,25 @@ fun rol(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 fun ror(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 fun rti(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 fun rts(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
-fun sbc(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
+
+fun sbc(addressMode: AddressMode) = { nesArch: NesArch ->
+    addressMode.address(nesArch) {
+        val value: U16 = fetched xor 0x00FFu
+        val temp: U16 = u16(value + nesArch.accumulator + (nesArch.status and 0x80u).rotateLeft(1))
+        val tempLo8 = temp.lo8()
+
+        setFlag(nesArch, Flag.C, temp > 0xFFu)
+        setFlag(
+            nesArch,
+            Flag.V,
+            ((u16(nesArch.accumulator) xor temp) and (temp xor value) and 0x0080u) > 0x00u
+        )
+        nesArch.status = flagsOf(nesArch.status, tempLo8, ::zeroFlag, ::negativeFlag)
+        nesArch.accumulator = tempLo8
+    }
+    1
+}
+
 fun sec(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 fun sed(addressMode: AddressMode) = { nesArch: NesArch -> 0 }
 fun sei(addressMode: AddressMode) = { nesArch: NesArch -> 0 }

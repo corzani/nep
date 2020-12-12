@@ -59,3 +59,9 @@ fun retrieveFlag(status: U8, flag: Flag, value: Boolean = true) = when (value) {
 fun setFlag(nesArch: NesArch, flag: Flag, value: Boolean) = nesArch.apply {
     status = retrieveFlag(status, flag)
 }
+
+fun getBit(data: U8, idx: Int) =
+    (data and u8(listOf(0x01u, 0x02u, 0x04u, 0x08u, 0x10u, 0x20u, 0x40u, 0x80u)[idx])).compareTo(0u) == 1
+
+fun onFlag(nesArch: NesArch, flag: Flag, block: () -> Unit) =
+    if ((nesArch.status and flag.bitMask) > 0u) block() else Unit

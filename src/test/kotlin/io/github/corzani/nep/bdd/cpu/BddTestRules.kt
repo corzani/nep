@@ -33,6 +33,8 @@ class BddRules : En {
             }
         }
 
+        ParameterType("address", "0[xX][0-9a-fA-F]+") { address -> Integer.decode(address) }
+
         ParameterType("flag", "C|Z|I|D|B|U|V|N") { flag ->
             when (flag) {
                 "C" -> Flag.C
@@ -95,13 +97,18 @@ class BddRules : En {
             when (be) {
                 true -> assertTrue(
                     (lastInstance!!.status and flag.bitMask).compareTo(0u) > 0,
-                    "Flag ${flag} should be ENABLED but seems to be DISABLED"
+                    "Flag $flag should be ENABLED but seems to be DISABLED"
                 )
                 false -> assertTrue(
                     (lastInstance!!.status and flag.bitMask).compareTo(0u) == 0,
-                    "Flag ${flag} should be DISABLED but seems to be ENABLED"
+                    "Flag $flag should be DISABLED but seems to be ENABLED"
                 )
             }
+        }
+
+        Then("address {address} should contain {binOrHex}") { address: Int, contain: Int ->
+            checkNotNull(lastInstance)
+            assertMemoryEquals(u8(contain), lastInstance!!.read(u16(address)))
         }
 
         And("CPU should have performed {int} cycles") { cycles: Int ->
