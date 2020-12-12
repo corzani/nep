@@ -32,13 +32,13 @@ internal class AddressModesTest {
             x = regX
             y = regY
 
-            absolute(this) {
+            absolute(this).let { (fetched) ->
                 assertMemoryEquals(expectedAddress, fetched)
             }
-            absoluteX(this) {
+            absoluteX(this).let { (fetched) ->
                 assertMemoryEquals(u16(expectedAddress + regX), fetched)
             }
-            absoluteY(this) {
+            absoluteY(this).let { (fetched) ->
                 assertMemoryEquals(u16(expectedAddress + regY), fetched)
             }
         }
@@ -54,15 +54,15 @@ internal class AddressModesTest {
             x = regX
             y = regY
 
-            zeroPage(this) {
+            zeroPage(this).let { (fetched) ->
                 assertMemoryEquals(u16(expectedAddress), fetched)
             }
 
-            zeroPageX(this) {
+            zeroPageX(this).let { (fetched) ->
                 assertMemoryEquals(u16(expectedAddress + regX), fetched)
             }
 
-            zeroPageY(this) {
+            zeroPageY(this).let { (fetched) ->
                 assertMemoryEquals(u16(expectedAddress + regY), fetched)
             }
         }
@@ -83,11 +83,11 @@ internal class AddressModesTest {
 
             write16(u16(lo), memory)
 
-            indirectX(this) {
+            indirectX(this).let { (fetched) ->
                 assertMemoryEquals(expectedAddressIndirectX(regX), fetched)
             }
 
-            indirectY(this) {
+            indirectY(this).let { (fetched) ->
                 assertMemoryEquals(u16(memory + regY), fetched)
             }
         }

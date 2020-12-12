@@ -40,8 +40,9 @@ enum class Flag(val bitMask: U8) {
     B(0x10u),
     U(0x20u),
     V(0x40u),
-    N(0x80u),
+    N(0x80u)
 }
+
 
 //fun writeFlag(ram: Ram, address: Int, data: U8) = ram.set(address, data)
 //fun Nes.writeFlag(address: Int, data: U8) = writeFlag(ram, address, data)
@@ -60,8 +61,19 @@ fun setFlag(nesArch: NesArch, flag: Flag, value: Boolean) = nesArch.apply {
     status = retrieveFlag(status, flag)
 }
 
+fun NesArch.setFlag(flag: Flag, value: Boolean) {
+    status = retrieveFlag(status, flag)
+}
+
+fun getFlag(nesArch: NesArch, flag: Flag): Boolean = nesArch.run {
+    status and flag.bitMask > 0u
+}
+
 fun getBit(data: U8, idx: Int) =
     (data and u8(listOf(0x01u, 0x02u, 0x04u, 0x08u, 0x10u, 0x20u, 0x40u, 0x80u)[idx])).compareTo(0u) == 1
 
-fun onFlag(nesArch: NesArch, flag: Flag, block: () -> Unit) =
-    if ((nesArch.status and flag.bitMask) > 0u) block() else Unit
+fun onFlag(nesArch: NesArch, flag: Flag, cond: Boolean, block: () -> Unit) =
+    when (((nesArch.status and flag.bitMask) > 0u) == cond) {
+        true -> block()
+        false -> Unit
+    }

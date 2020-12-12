@@ -21,7 +21,6 @@ fun incrAddress(address: U16, increment: Byte): U16 =
 
 fun toSigned(u8: U8): Byte = u8.toByte()
 
-
 data class U16Split(val lo: U8, val hi: U8)
 data class Address(val fetched: U16, val pageCrossed: Boolean, val length: Int)
 
@@ -52,6 +51,7 @@ fun write16(ram: Ram, address: U16, data: U16) = data.splitLoHi { lo: U8, hi: U8
 }
 
 fun NesArch.write16(address: U16, data: U16) = write16(ram, address, data)
+
 
 fun write(ram: Ram, address: U16, data: U8) = data.let { ram[address.toInt()] = it }
 fun NesArch.write(address: U16, data: U8) = write(ram, address, data)
