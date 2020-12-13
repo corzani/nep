@@ -24,7 +24,8 @@ fun instructionHandler(nesArch: NesArch) = fun(opcode: U8): Int {
     val currentInstruction = opcodes[opcode.toInt()]
     ++nesArch.pc
     // TODO... Check when I have additional cycles
-    return currentInstruction.cycles // + currentInstruction.instruction(nesArch)
+    currentInstruction.instruction(nesArch) // TODO check additional Cycle
+    return currentInstruction.cycles
 }
 
 data class Op(val name: String, val instruction: (NesArch) -> Boolean, val cycles: Int)

@@ -22,7 +22,7 @@ fun incrAddress(address: U16, increment: Byte): U16 =
 fun toSigned(u8: U8): Byte = u8.toByte()
 
 data class U16Split(val lo: U8, val hi: U8)
-data class Address(val fetched: U16, val pageCrossed: Boolean, val length: Int)
+data class Address(val address: U16, val pageCrossed: Boolean, val length: Int)
 
 fun read(ram: Ram, address: U16): U8 = ram[address.toInt()]
 fun NesArch.read(address: U16): U8 = read(ram, address)
