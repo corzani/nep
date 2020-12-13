@@ -49,7 +49,6 @@ fun asl(addressMode: AddressMode) = opImpl(false) {
 
 fun bcc(addressMode: AddressMode) = opImpl(false) {
     branchOnFlag(addressMode, Flag.C, false)
-
 }
 
 fun bcs(addressMode: AddressMode) = opImpl(false) {
@@ -59,7 +58,6 @@ fun bcs(addressMode: AddressMode) = opImpl(false) {
 
 fun beq(addressMode: AddressMode) = opImpl(false) {
     branchOnFlag(addressMode, Flag.Z, true)
-
 }
 
 fun bit(addressMode: AddressMode) = opImpl(false) {
@@ -73,12 +71,10 @@ fun bmi(addressMode: AddressMode) = opImpl(false) {
 
 fun bne(addressMode: AddressMode) = opImpl(false) {
     branchOnFlag(addressMode, Flag.C, false)
-
 }
 
 fun bpl(addressMode: AddressMode) = opImpl(false) {
     branchOnFlag(addressMode, Flag.N, false)
-
 }
 
 fun brk(addressMode: AddressMode) = opImpl(false) {
@@ -86,17 +82,14 @@ fun brk(addressMode: AddressMode) = opImpl(false) {
 
 fun bvc(addressMode: AddressMode) = opImpl(false) {
     branchOnFlag(addressMode, Flag.Z, false)
-
 }
 
 fun bvs(addressMode: AddressMode) = opImpl(false) {
     branchOnFlag(addressMode, Flag.V, true)
-
 }
 
 fun clc(addressMode: AddressMode) = opImpl(false) {
     setCarryFlag(false)
-
 }
 
 fun cld(addressMode: AddressMode) = opImpl(false) {
@@ -112,7 +105,14 @@ fun clv(addressMode: AddressMode) = opImpl(false) {
 
 }
 
-fun cmp(addressMode: AddressMode) = opImpl(false) { }
+// TODO
+fun cmp(addressMode: AddressMode) = opImpl(false) {
+    val (fetched) = addressMode.address(this)
+    val temp = accumulator.toInt() - fetched.toInt()
+    setCarryFlag(accumulator >= fetched)
+   // setZeroFlag()
+}
+
 fun cpx(addressMode: AddressMode) = opImpl(false) { }
 fun cpy(addressMode: AddressMode) = opImpl(false) { }
 fun dec(addressMode: AddressMode) = opImpl(false) { }
@@ -148,16 +148,18 @@ fun ldy(addressMode: AddressMode) = opImpl(true) {
 fun lsr(addressMode: AddressMode) = opImpl(false) {
 
     val (fetched) = addressMode.address(this)
-    setCarryFlag(fetched.isBitSet(0))
-    val temp = fetched.rotateLeft(1) and 0x7Fu
-    setZeroFlag(temp.lo8() == u8(0x00u))
-    setNegativeFlag(temp.lo8().isBitSet(7))
+    val value = read(fetched)
+
+    setCarryFlag(value.isBitSet(0))
+    val temp = value.rotateRight(1) and 0x7Fu
+    setZeroFlag(value == u8(0x00u))
+    setNegativeFlag(value.isBitSet(7))
 
     when (addressMode) {
         Immediate -> {
-            accumulator = temp.lo8()
+            accumulator = temp
         }
-        else -> write(fetched, temp.lo8())
+        else -> write(fetched, temp)
     }
 
 }

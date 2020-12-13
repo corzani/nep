@@ -45,18 +45,17 @@ class MainTest {
     }
 
     @Test
+    fun `Substraction on U16`() {
+        println(u16(50) - u16(90))
+    }
+
+    @Test
     fun `Write 16 Bit Unsigned Short Int to Ram`() {
         val ram = mem(0xABu, 0xB6u, 0x23u, 0xE3u, 0x45u)
         val expectedRam = mem(0xABu, 0xB6u, 0x12u, 0xF0u, 0x45u)
 
         write16(ram, 2u, 0xF012u)
         assertEquals(expectedRam.toList(), ram.toList())
-    }
-
-    @Test
-    fun getB() {
-        assertFalse(getBit(0b10000000u, 0))
-        assertTrue(getBit(0b10000000u, 7))
     }
 
 }
