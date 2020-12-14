@@ -29,7 +29,7 @@ fun U8.isBitSet(ind: Int) = (this and u8(1u).rotateLeft(ind)) > 0u
 
 fun mem(vararg bytes: U8) = ubyteArrayOf(*bytes)
 
-fun incrAddress(address: U16, increment: Byte): U16 =
+fun incrementAddress(address: U16, increment: Byte): U16 =
     u16(address.toInt() + increment.toInt())
 
 fun toSigned(u8: U8): Byte = u8.toByte()
@@ -52,19 +52,19 @@ fun write16(ram: Ram, address: U16, data: U16) = data.splitLoHi { lo: U8, hi: U8
 }
 
 fun stackPush(nesArch: NesArch, data: U8) = nesArch.run {
-    write(ram, u16(0x0100u + --stackpointer), data)
+    write(ram, u16(0x0100u + --stackPointer), data)
 }
 
 fun stackPush(nesArch: NesArch, data: U16) = nesArch.run {
-    stackpointer = u8(stackpointer - 2u)
-    write16(u16(0x0100u + this.stackpointer), data)
+    stackPointer = u8(stackPointer - 2u)
+    write16(u16(0x0100u + this.stackPointer), data)
 }
 
-fun stackPop8(nesArch: NesArch) = nesArch.run { read(u16(0x0100u + stackpointer++)) }
+fun stackPop8(nesArch: NesArch) = nesArch.run { read(u16(0x0100u + stackPointer++)) }
 
 fun stackPop16(nesArch: NesArch): U16 = nesArch.run {
-    stackpointer = u8(stackpointer + 2u)
-    return read16(u16(0x0100u + this.stackpointer))
+    stackPointer = u8(stackPointer + 2u)
+    return read16(u16(0x0100u + this.stackPointer))
 }
 
 

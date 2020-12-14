@@ -2,7 +2,6 @@ package io.github.corzani.nep
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class MainTest {
@@ -21,13 +20,9 @@ class MainTest {
     @Test
     fun `Set Flags`() {
         val status = u8(0b00000000)
-        flagsOf(status, u8(0b00000000), ::zeroFlag).let { actual ->
-            assertEquals(u8(0b00000010), actual)
-        }
+        assertEquals(u8(0b00000010), flagsOf(status, u8(0b00000000), ::zeroFlag))
 
-        flagsOf(status, u8(0b10000000), ::negativeFlag).let { actual ->
-            assertEquals(u8(0b10000000), actual)
-        }
+        assertEquals(u8(0b10000000), flagsOf(status, u8(0b10000000), ::negativeFlag))
     }
 
     @Test
@@ -42,11 +37,6 @@ class MainTest {
         assertTrue(u8(0b00000001u).isBitSet(0))
         assertTrue(u16(0x0002u).isBitSet(1))
         assertTrue(u8(0b00000100u).isBitSet(2))
-    }
-
-    @Test
-    fun `Substraction on U16`() {
-        println(u16(50) - u16(90))
     }
 
     @Test

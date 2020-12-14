@@ -222,27 +222,27 @@ fun ora(addressMode: AddressMode) = opImpl(true) {
 }
 
 fun pha(addressMode: AddressMode) = opImpl(false) {
-    write(u16(0x0100u + stackpointer), accumulator).also { --stackpointer }
+    write(u16(0x0100u + stackPointer), accumulator).also { --stackPointer }
 }
 
 fun php(addressMode: AddressMode) = opImpl(false) {
-    write(u16(0x0100u + stackpointer), status or Flag.B.bitMask or Flag.U.bitMask)
+    write(u16(0x0100u + stackPointer), status or Flag.B.bitMask or Flag.U.bitMask)
         .also {
             setBreakFlag(false)
             setFlag(Flag.U, false)
-            --stackpointer
+            --stackPointer
         }
 }
 
 fun pla(addressMode: AddressMode) = opImpl(false) {
-    ++stackpointer
-    accumulator = read(u16(0x0100u + stackpointer))
+    ++stackPointer
+    accumulator = read(u16(0x0100u + stackPointer))
     setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
 }
 
 fun plp(addressMode: AddressMode) = opImpl(false) {
-    ++stackpointer
-    status = read(u16(0x0100u + stackpointer))
+    ++stackPointer
+    status = read(u16(0x0100u + stackPointer))
     setFlag(Flag.U, true)
 }
 
@@ -338,7 +338,7 @@ fun sty(addressMode: AddressMode) = opImpl(false) {
 }
 
 fun tsx(addressMode: AddressMode) = opImpl(false) {
-    x = stackpointer
+    x = stackPointer
     setFlagsFrom(x, ::zeroFlag, ::negativeFlag)
 }
 
@@ -359,7 +359,7 @@ fun txa(addressMode: AddressMode) = opImpl(false) {
 }
 
 fun txs(addressMode: AddressMode) = opImpl(false) {
-    stackpointer = x
+    stackPointer = x
 }
 
 fun tya(addressMode: AddressMode) = opImpl(false) {

@@ -9,7 +9,7 @@ internal class OpcodesTest {
     }
 
     @Test
-    fun `AND`() = mem(0x29u, 0b10101010u)
+    fun and() = mem(0x29u, 0b10101010u)
         .let(::loadFromMemory)
         .run {
             accumulator = 0b10001101u

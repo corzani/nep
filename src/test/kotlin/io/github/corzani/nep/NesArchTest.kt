@@ -10,11 +10,11 @@ internal class NesArchTest {
         val u8: U8 = 0xFFu
         val u16: U16 = 0x000Fu
         assertEquals(-1, toSigned(u8))
-        assertEquals(u16(0x000E), incrAddress(u16, toSigned(u8)))
+        assertEquals(u16(0x000E), incrementAddress(u16, toSigned(u8)))
     }
 
     @Test
-    fun `Substraction clue`() {
+    fun `Subtraction clue`() {
         val u8: U8 = 0x00u
         val temp = u16(u8 - 1u)
         assertEquals(0xFF, temp.lo8().toInt())

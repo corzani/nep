@@ -10,7 +10,7 @@ class NesArch(
     var accumulator: U8 = 0x00u,
     var x: U8 = 0x00u,
     var y: U8 = 0x00u,
-    var stackpointer: U8 = 0x00u,
+    var stackPointer: U8 = 0x00u,
     var status: U8 = 0x00u,
     val cartSize: Int = 0,
     var pc: U16 = read16(ram, 0xFFFCu),

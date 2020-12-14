@@ -13,6 +13,7 @@ object Accumulator : Register()
 object X : Register()
 object Y : Register()
 
+@Suppress("unused")
 class BddRules : En {
 
     init {
@@ -49,7 +50,7 @@ class BddRules : En {
             }
         }
 
-        ParameterType("enableable", "ENABLED|DISABLED") { value ->
+        ParameterType("enableDisable", "ENABLED|DISABLED") { value ->
             when (value) {
                 "ENABLED" -> true
                 "DISABLED" -> false
@@ -92,15 +93,16 @@ class BddRules : En {
             }
         }
 
-        And("{flag} flag should be {enableable}") { flag: Flag, be: Boolean ->
+        And("{flag} flag should be {enableDisable}") { flag: Flag, be: Boolean ->
             checkNotNull(lastInstance)
             when (be) {
                 true -> assertTrue(
-                    (lastInstance!!.status and flag.bitMask).compareTo(0u) > 0,
+                    (lastInstance!!.status and flag.bitMask) > 0u,
                     "Flag $flag should be ENABLED but seems to be DISABLED"
                 )
-                false -> assertTrue(
-                    (lastInstance!!.status and flag.bitMask).compareTo(0u) == 0,
+                false -> assertEquals(
+                    u8(0),
+                    (lastInstance!!.status and flag.bitMask),
                     "Flag $flag should be DISABLED but seems to be ENABLED"
                 )
             }
