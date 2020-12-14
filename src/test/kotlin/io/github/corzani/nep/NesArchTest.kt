@@ -22,11 +22,6 @@ internal class NesArchTest {
         var u8Var: U8 = 0x00u
         --u8Var
         assertEquals(0xFFu, u8Var)
-
-
-        val test1 = 0u - 1u
-        val test2 = u16(test1)
-        assertEquals(test1, test2) // Implicit conversion ok? I am probably only testing Kotlin itself :D
     }
 
 }

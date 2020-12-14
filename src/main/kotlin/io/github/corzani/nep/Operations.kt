@@ -1,6 +1,6 @@
 package io.github.corzani.nep
 
-val opcodes = listOf(
+fun opcodes() = listOf(
 // ROW 0
     Op("BRK", brk(Immediate), 7),
     Op("ORA", ora(IndirectX), 6),
@@ -274,5 +274,3 @@ val opcodes = listOf(
     Op("INC", inc(AbsoluteX), 7),
     Op("???", xxx(Implied), 7)
 )
-
-fun getOperatorsMap() = opcodes.mapIndexed { idx, op -> op.name to idx }.toMap()

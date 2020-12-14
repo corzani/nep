@@ -1,8 +1,8 @@
 package io.github.corzani.nep
 
-fun runAll(nesArch: NesArch) = mainLoop(nesArch, instructionHandler(nesArch))
+fun runAll(nesArch: NesArch) = mainLoop(nesArch, instructionHandler(opcodes(), nesArch))
 
-fun NesArch.start() = mainLoop(this, instructionHandler(this))
+fun NesArch.start() = mainLoop(this, instructionHandler(opcodes(), this))
 
 tailrec fun mainLoop(nesArch: NesArch, runInstruction: Instruction) {
     runInstruction(read(nesArch.ram, nesArch.pc))
@@ -20,7 +20,7 @@ fun testLoop(
 }
 
 // TODO toInt shouldn't be here
-fun instructionHandler(nesArch: NesArch) = fun(opcode: U8): Int {
+fun instructionHandler(opcodes: List<Op>, nesArch: NesArch) = fun(opcode: U8): Int {
     val currentInstruction = opcodes[opcode.toInt()]
     ++nesArch.pc
     // TODO... Check when I have additional cycles
