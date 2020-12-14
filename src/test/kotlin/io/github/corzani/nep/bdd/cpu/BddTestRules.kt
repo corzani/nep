@@ -8,7 +8,7 @@ import kotlin.test.assertTrue
 
 var lastInstance: NesArch? = null
 
-sealed class Register()
+sealed class Register
 object Accumulator : Register()
 object X : Register()
 object Y : Register()

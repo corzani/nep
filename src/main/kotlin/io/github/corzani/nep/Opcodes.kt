@@ -147,7 +147,7 @@ fun dey(addressMode: AddressMode) = opImpl(false) {
 
 fun eor(addressMode: AddressMode) = opImpl(true) {
     val (fetched) = fetchFrom(addressMode)
-    accumulator = accumulator xor fetched;
+    accumulator = accumulator xor fetched
     setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
 }
 

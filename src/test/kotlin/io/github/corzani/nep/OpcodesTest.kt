@@ -15,7 +15,7 @@ internal class OpcodesTest {
             accumulator = 0b10001101u
             test()
 
-            assertEquals(u8(0b10101010u and 0b10001101u), accumulator);
+            assertEquals(u8(0b10101010u and 0b10001101u), accumulator)
             assertEquals(statusWith(Flag.N), status)
         }
 
@@ -134,7 +134,7 @@ internal class OpcodesTest {
             write(0x10u, 0xF5u)
             test()
 
-            assertEquals(0xF5u, accumulator);
+            assertEquals(0xF5u, accumulator)
             assertEquals(statusWith(Flag.N), status)
         }
 

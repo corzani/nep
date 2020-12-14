@@ -19,7 +19,7 @@ internal class NesArchTest {
         val temp = u16(u8 - 1u)
         assertEquals(0xFF, temp.lo8().toInt())
 
-        var u8Var: U8 = 0x00u;
+        var u8Var: U8 = 0x00u
         --u8Var
         assertEquals(0xFFu, u8Var)
 
