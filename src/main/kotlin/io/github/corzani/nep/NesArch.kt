@@ -3,6 +3,8 @@ package io.github.corzani.nep
 const val RAM_SIZE = 1024 * 64
 const val CARTRIDGE_ROM_ADDRESS = 0x8000
 
+typealias Instruction = (opcode: U8) -> Int
+
 class NesArch(
     val ram: Ram = Ram(RAM_SIZE).apply(::initRam),
     var accumulator: U8 = 0x00u,
@@ -19,12 +21,6 @@ fun NesArch.initRam() {
     write16(ram, 0xFFFCu, 0x8000u)
 }
 
-// TODO idea? Or maybe not
-
-//fun NesArch.fetch(fn: (NesArch, Address.() -> Unit) -> Unit) = fn(this) {
-//
-//}
-
 fun NesArch.incrementPcBy(value: Int) {
     pc = u16(pc + u16(value))
 }
@@ -33,7 +29,18 @@ fun initRam(ram: Ram) {
     write16(ram, 0xFFFCu, 0x8000u)
 }
 
-fun createNes(block: NesArch.() -> Unit) = block(NesArch())
+fun NesArch.read16(address: U16): U16 = read16(ram, address)
+
+fun NesArch.write16(address: U16, data: U16) = write16(ram, address, data)
+
+fun NesArch.read(address: U16): U8 = read(ram, address)
+fun NesArch.write(address: U16, data: U8) = write(ram, address, data)
+
+fun NesArch.stackPush(data: U8) = stackPush(this, data)
+fun NesArch.stackPush(data: U16) = stackPush(this, data)
+
+fun NesArch.stackPop8() = stackPop8(this)
+fun NesArch.stackPop16() = stackPop16(this)
 
 fun NesArch.test() = testLoop(this, instructionHandler(this), u16(CARTRIDGE_ROM_ADDRESS + this.cartSize))
 
@@ -55,9 +62,9 @@ fun loadFromMemory(program: Program, block: NesArch.() -> Unit) =
 
 fun NesArch.getAddressFrom(addressMode: AddressMode) = addressMode.address(this)
 
-data class FetchedAddress(val fetched: U8, val address: U16)
 fun NesArch.fetchFrom(addressMode: AddressMode) =
     addressMode.address(this).address.let {
         FetchedAddress(fetched = this.read(it), address = it)
     }
 
+fun createNes(block: NesArch.() -> Unit) = block(NesArch())

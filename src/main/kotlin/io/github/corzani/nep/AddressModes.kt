@@ -14,14 +14,8 @@ object AbsoluteY : AddressMode("Absolute Y", ::absoluteY)
 object IndirectX : AddressMode("Indirect X", ::indirectX)
 object IndirectY : AddressMode("Indirect Y", ::indirectY)
 
-fun zp(ram: Ram, pc: U16, reg: U8) = u16(read(ram, pc) + reg)
-fun ab(ram: Ram, pc: U16, reg: U8) = u16(read16(ram, pc) + reg)
-
-fun zeroFlag(status: U8, reg: U8): U8 =
-    retrieveFlag(status, Flag.Z, reg.toInt() == 0)
-
-fun negativeFlag(status: U8, reg: U8): U8 =
-    retrieveFlag(status, Flag.N, (reg and 0x80u) == u8(0x80))
+fun readZeroPageAddress(ram: Ram, pc: U16, reg: U8) = u16(read(ram, pc) + reg)
+fun readAbsoluteAddress(ram: Ram, pc: U16, reg: U8) = u16(read16(ram, pc) + reg)
 
 fun immediate(nesArch: NesArch): Address =
     Address(address = nesArch.pc, pageCrossed = false, length = 1).also {
@@ -45,7 +39,7 @@ fun indirect(nesArch: NesArch): Address =
     }
 
 fun absolute(nesArch: NesArch): Address = Address(
-    address = ab(nesArch.ram, nesArch.pc, 0u),
+    address = readAbsoluteAddress(nesArch.ram, nesArch.pc, 0u),
     pageCrossed = false,
     length = 2
 ).also {
@@ -53,7 +47,7 @@ fun absolute(nesArch: NesArch): Address = Address(
 }
 
 fun absoluteX(nesArch: NesArch): Address = Address(
-    ab(nesArch.ram, nesArch.pc, nesArch.x),
+    readAbsoluteAddress(nesArch.ram, nesArch.pc, nesArch.x),
     pageCrossed = false,
     length = 2
 ).also {
@@ -61,7 +55,7 @@ fun absoluteX(nesArch: NesArch): Address = Address(
 }
 
 fun absoluteY(nesArch: NesArch): Address = Address(
-    ab(nesArch.ram, nesArch.pc, nesArch.y),
+    readAbsoluteAddress(nesArch.ram, nesArch.pc, nesArch.y),
     pageCrossed = false,
     length = 2
 ).also {
@@ -69,7 +63,7 @@ fun absoluteY(nesArch: NesArch): Address = Address(
 }
 
 fun zeroPage(nesArch: NesArch): Address = Address(
-    address = zp(nesArch.ram, nesArch.pc, 0u),
+    address = readZeroPageAddress(nesArch.ram, nesArch.pc, 0u),
     pageCrossed = false,
     length = 1
 ).also {
@@ -77,7 +71,7 @@ fun zeroPage(nesArch: NesArch): Address = Address(
 }
 
 fun zeroPageX(nesArch: NesArch): Address = Address(
-    address = zp(nesArch.ram, nesArch.pc, nesArch.x),
+    address = readZeroPageAddress(nesArch.ram, nesArch.pc, nesArch.x),
     pageCrossed = false,
     length = 1
 ).also {
@@ -85,7 +79,7 @@ fun zeroPageX(nesArch: NesArch): Address = Address(
 }
 
 fun zeroPageY(nesArch: NesArch): Address = Address(
-    address = zp(nesArch.ram, nesArch.pc, nesArch.y),
+    address = readZeroPageAddress(nesArch.ram, nesArch.pc, nesArch.y),
     pageCrossed = false,
     length = 1
 ).also {
@@ -93,7 +87,7 @@ fun zeroPageY(nesArch: NesArch): Address = Address(
 }
 
 fun indirectX(nesArch: NesArch): Address = Address(
-    address = zp(nesArch.ram, nesArch.pc, nesArch.x).splitLoHi { lo: U8, hi: U8 ->
+    address = readZeroPageAddress(nesArch.ram, nesArch.pc, nesArch.x).splitLoHi { lo: U8, hi: U8 ->
         fromLoHi(lo = lo, hi = u8(hi + 1u))
     },
     pageCrossed = false,
