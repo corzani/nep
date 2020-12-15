@@ -2,7 +2,7 @@ package io.github.corzani.nep
 
 fun branch(nesArch: NesArch, address: U16, flag: Flag, cond: Boolean) = onFlag(nesArch, flag, cond) {
     ++nesArch.cycles
-    val jump = toSigned(read(nesArch.ram, address))
+    val jump = toSigned(nesArch.bus.read(address))
     val jumpTo = incrementAddress(nesArch.pc, jump) + 1u
     val additionalTickRequired = ((nesArch.pc + 1u) and 0xFF00u) != (jumpTo and 0xFF00u)
 

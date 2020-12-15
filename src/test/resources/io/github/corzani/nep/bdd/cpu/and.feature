@@ -31,9 +31,9 @@ Feature: AND Opcodes
     And CPU should have performed 4 cycles
 
   Scenario: AND (0x2D) Absolute
-    Given ROM memory "0x2D 0xAA 0xBF"
+    Given ROM memory "0x2D 0x10 0x02"
     And Accumulator register is 0x8D
-    And 0x8B is stored at address 0xBFAA
+    And 0x8B is stored at address 0x0210
     When code is executed
     Then Accumulator register should be 0x89
     And N flag should be ENABLED
@@ -41,10 +41,10 @@ Feature: AND Opcodes
     And CPU should have performed 4 cycles
 
   Scenario: AND (0x3D) Absolute, X
-    Given ROM memory "0x3D 0xAA 0xBF"
+    Given ROM memory "0x3D 0x10 0x02"
     And Accumulator register is 0x8D
     And X register is 0x02
-    And 0x8B is stored at address 0xBFAC
+    And 0x8B is stored at address 0x0212
     When code is executed
     Then Accumulator register should be 0x89
     And N flag should be ENABLED
@@ -52,10 +52,10 @@ Feature: AND Opcodes
     And CPU should have performed 4 cycles
 
   Scenario: AND (0x39) Absolute, Y
-    Given ROM memory "0x39 0xAA 0xBF"
+    Given ROM memory "0x39 0x10 0x02"
     And Accumulator register is 0x8D
     And Y register is 0x02
-    And 0x8B is stored at address 0xBFAC
+    And 0x8B is stored at address 0x0212
     When code is executed
     Then Accumulator register should be 0x89
     And N flag should be ENABLED

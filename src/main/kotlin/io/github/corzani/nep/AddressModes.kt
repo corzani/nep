@@ -10,11 +10,11 @@ fun addressFn(fn: AddressModeFn): AddressModeFn = { nesArch ->
     }
 }
 
-fun readZeroPageAddress(ram: Ram, pc: U16, reg: U8) = read(ram, pc).let {
+fun readZeroPageAddress(bus: Bus, pc: U16, reg: U8) = bus.read(pc).let {
     (u16(it) to u16(it + reg))
 }
 
-fun readAbsoluteAddress(ram: Ram, pc: U16, reg: U8) = read16(ram, pc).let {
+fun readAbsoluteAddress(bus: Bus, pc: U16, reg: U8) = bus.read16(pc).let {
     (it to u16(it + reg))
 }
 
@@ -36,13 +36,13 @@ fun implied(nesArch: NesArch): Address =
 fun relative(nesArch: NesArch): Address =
     Address(nesArch.pc, pageCrossed = false, length = 1, origin = nesArch.pc, type = AddressType.Relative)
 
-fun indirect(nesArch: NesArch): Address = read16(nesArch.ram, nesArch.pc).let { origin ->
+fun indirect(nesArch: NesArch): Address = nesArch.bus.read16(nesArch.pc).let { origin ->
 
     // TODO Check Page Boundary Bug
     val validAddress = if (origin.lo8() == u8(0xFFu)) {
-        fromLoHi(lo = read(nesArch.ram, origin), hi = read(nesArch.ram, origin and 0xFF00u))
+        fromLoHi(lo = nesArch.bus.read(origin), hi = nesArch.bus.read(origin and 0xFF00u))
     } else {
-        read16(nesArch.ram, origin)
+        nesArch.bus.read16(origin)
     }
 
     Address(
@@ -54,7 +54,7 @@ fun indirect(nesArch: NesArch): Address = read16(nesArch.ram, nesArch.pc).let { 
     )
 }
 
-fun absolute(nesArch: NesArch): Address = readAbsoluteAddress(nesArch.ram, nesArch.pc, 0u).let { (origin, address) ->
+fun absolute(nesArch: NesArch): Address = readAbsoluteAddress(nesArch.bus, nesArch.pc, 0u).let { (origin, address) ->
     Address(
         address = address,
         pageCrossed = false,
@@ -65,7 +65,7 @@ fun absolute(nesArch: NesArch): Address = readAbsoluteAddress(nesArch.ram, nesAr
 }
 
 fun absoluteX(nesArch: NesArch): Address =
-    readAbsoluteAddress(nesArch.ram, nesArch.pc, nesArch.x).let { (origin, address) ->
+    readAbsoluteAddress(nesArch.bus, nesArch.pc, nesArch.x).let { (origin, address) ->
         Address(
             address = address,
             pageCrossed = false,
@@ -76,7 +76,7 @@ fun absoluteX(nesArch: NesArch): Address =
     }
 
 fun absoluteY(nesArch: NesArch): Address =
-    readAbsoluteAddress(nesArch.ram, nesArch.pc, nesArch.y).let { (origin, address) ->
+    readAbsoluteAddress(nesArch.bus, nesArch.pc, nesArch.y).let { (origin, address) ->
 
         Address(
             address = address,
@@ -88,7 +88,7 @@ fun absoluteY(nesArch: NesArch): Address =
     }
 
 fun zeroPage(nesArch: NesArch): Address =
-    readZeroPageAddress(nesArch.ram, nesArch.pc, 0u).let { (origin, address) ->
+    readZeroPageAddress(nesArch.bus, nesArch.pc, 0u).let { (origin, address) ->
         Address(
             address = address,
             pageCrossed = false,
@@ -99,7 +99,7 @@ fun zeroPage(nesArch: NesArch): Address =
     }
 
 fun zeroPageX(nesArch: NesArch): Address =
-    readZeroPageAddress(nesArch.ram, nesArch.pc, nesArch.x).let { (origin, address) ->
+    readZeroPageAddress(nesArch.bus, nesArch.pc, nesArch.x).let { (origin, address) ->
         Address(
             address = address,
             pageCrossed = false,
@@ -110,7 +110,7 @@ fun zeroPageX(nesArch: NesArch): Address =
     }
 
 fun zeroPageY(nesArch: NesArch): Address =
-    readZeroPageAddress(nesArch.ram, nesArch.pc, nesArch.y).let { (origin, address) ->
+    readZeroPageAddress(nesArch.bus, nesArch.pc, nesArch.y).let { (origin, address) ->
         Address(
             address = address,
             pageCrossed = false,
@@ -122,7 +122,7 @@ fun zeroPageY(nesArch: NesArch): Address =
     }
 
 fun indirectX(nesArch: NesArch): Address =
-    readZeroPageAddress(nesArch.ram, nesArch.pc, nesArch.x).let { (origin, address) ->
+    readZeroPageAddress(nesArch.bus, nesArch.pc, nesArch.x).let { (origin, address) ->
         Address(
             address = address.splitLoHi { lo: U8, hi: U8 ->
                 fromLoHi(lo = lo, hi = u8(hi + 1u))
@@ -136,11 +136,11 @@ fun indirectX(nesArch: NesArch): Address =
     }
 
 fun indirectY(nesArch: NesArch): Address =
-    read(nesArch.ram, nesArch.pc).let {
+    nesArch.bus.read(nesArch.pc).let {
         Address(
             origin = u16(it),
             address = it
-                .let { address: U8 -> read16(nesArch.ram, u16(address)) + u16(nesArch.y) }
+                .let { address: U8 -> nesArch.bus.read16(u16(address)) + u16(nesArch.y) }
                 .let(::u16),
             pageCrossed = false,
             length = 1,
@@ -170,10 +170,10 @@ fun to6502Notation(address: U16) = address.splitLoHi { lo, hi ->
 
 fun translate(address: U16) = "0x${humanReadable(address)}:${address.toInt()}"
 
-fun Address.humanReadable(ram: Ram, computed: Boolean = true): String {
+fun Address.humanReadable(bus: Bus, computed: Boolean = true): String {
     val currentAddress = if (computed) address else origin
     return when (this.type) {
-        AddressType.Immediate -> read(ram, origin)
+        AddressType.Immediate -> bus.read(origin)
             .let { value -> "#\$${humanReadable(value)} => Imm ${humanReadable(value)}:${value.toInt()}" }
         AddressType.Implied -> ""
         AddressType.Relative -> "\$${to6502Notation(origin)} => Addr ${translate(address)}"

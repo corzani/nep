@@ -1,6 +1,6 @@
 package io.github.corzani.nep
 
-typealias Ram = UByteArray
+typealias Memory = UByteArray
 typealias Program = UByteArray
 typealias U8 = UByte
 typealias U16 = UShort
@@ -56,17 +56,17 @@ fun incrementAddress(address: U16, increment: Byte): U16 =
 
 fun toSigned(u8: U8): Byte = u8.toByte()
 
-fun read(ram: Ram, address: U16): U8 = ram[address.toInt()]
-fun write(ram: Ram, address: U16, data: U8) = data.let { ram[address.toInt()] = it }
+fun read(ram: Memory, address: U16): U8 = ram[address.toInt()]
+fun write(ram: Memory, address: U16, data: U8) = data.let { ram[address.toInt()] = it }
 
-fun read16(ram: Ram, address: U16): U16 =
+fun read16(ram: Memory, address: U16): U16 =
     u16(ram[address.toInt() + 1]).rotateLeft(8) or u16(ram[address.toInt()])
 
 fun fromLoHi(lo: U8, hi: U8): U16 = u16(hi).rotateLeft(8) or u16(lo)
 
 fun <T> U16.splitLoHi(fn: ((lo: U8, hi: U8) -> T)): T = this.splitLoHi().run { fn(lo, hi) }
 
-fun write16(ram: Ram, address: U16, data: U16) = data.splitLoHi { lo: U8, hi: U8 ->
+fun write16(ram: Memory, address: U16, data: U16) = data.splitLoHi { lo: U8, hi: U8 ->
     address.toInt().let {
         ram[it] = lo
         ram[it + 1] = hi
@@ -74,7 +74,7 @@ fun write16(ram: Ram, address: U16, data: U16) = data.splitLoHi { lo: U8, hi: U8
 }
 
 fun stackPush(nesArch: NesArch, data: U8) = nesArch.run {
-    write(ram, u16(0x0100u + --stackPointer), data)
+    write(u16(0x0100u + --stackPointer), data)
 }
 
 fun stackPush(nesArch: NesArch, data: U16) = nesArch.run {

@@ -5,7 +5,7 @@ fun runAll(nesArch: NesArch) = mainLoop(nesArch, instructionHandler(opcodes(), n
 fun NesArch.start() = mainLoop(this, instructionHandler(opcodes(), this))
 
 tailrec fun mainLoop(nesArch: NesArch, runInstruction: Instruction) {
-    runInstruction(read(nesArch.ram, nesArch.pc))
+    runInstruction(nesArch.bus.read(nesArch.pc))
     mainLoop(nesArch, runInstruction)
 }
 
@@ -15,7 +15,7 @@ fun testLoop(
     runUntilPC: U16
 ) {
     while (nesArch.pc < runUntilPC) {
-        nesArch.cycles += runInstruction(read(nesArch.ram, nesArch.pc))
+        nesArch.cycles += runInstruction(nesArch.bus.read(nesArch.pc))
     }
 }
 
@@ -28,7 +28,7 @@ fun instructionHandler(opcodes: List<Op>, nesArch: NesArch) = fun(opcode: U8): I
     val result = currentInstruction.memory.address(nesArch)
     val opcodeHex = "(0x${humanReadable(opcode)})"
 
-    println("$opcodeHex ${currentInstruction.name} ${result.humanReadable(nesArch.ram, false)}")
+    println("$opcodeHex ${currentInstruction.name} ${result.humanReadable(nesArch.bus, false)}")
 
     currentInstruction.instruction(result)(nesArch) // TODO check additional Cycle
     return currentInstruction.cycles
