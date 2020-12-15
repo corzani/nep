@@ -73,7 +73,21 @@ class MainTest {
             0xeau, 0xcau, 0xd0u, 0xfbu, 0x60u
         ).let(::loadFromMemory)
 
-        nesArch.test()
+        nesArch.runTest()
     }
 
+    @Test
+    fun `Test 1()`() = test(
+        mem(0xa9u, 0xc0u, 0xaau, 0xe8u, 0x00u)
+    ) {
+        runTest()
+        assertMemoryEquals(x, 0xc1u)
+    }
+
+    @Test
+    fun `Test 2()`() = test(
+        mem(0xe8u, 0xe8u, 0x00u)
+    ) {
+        assertMemoryEquals(x, 0x01u)
+    }
 }

@@ -60,7 +60,7 @@ class BddRules : En {
 
         When("code is executed") {
             checkNotNull(lastInstance, { "Cartridge Memory NOT loaded" })
-            lastInstance!!.test()
+            lastInstance!!.runTest()
         }
 
         Given("ROM memory {string}") { str: String ->

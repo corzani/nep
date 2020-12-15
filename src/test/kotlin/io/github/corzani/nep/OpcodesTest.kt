@@ -5,15 +5,14 @@ import kotlin.test.*
 internal class OpcodesTest {
 
     @Test
-    fun adc() {
-    }
+    fun adc() {}
 
     @Test
     fun and() = mem(0x29u, 0b10101010u)
         .let(::loadFromMemory)
         .run {
             accumulator = 0b10001101u
-            test()
+            runTest()
 
             assertEquals(u8(0b10101010u and 0b10001101u), accumulator)
             assertEquals(statusWith(Flag.N), status)
@@ -128,11 +127,11 @@ internal class OpcodesTest {
     }
 
     @Test
-    fun `LDA from memory`() = mem(0xa5u, 0x10u, 0x00u)
+    fun `LDA from memory`() = mem(0xa5u, 0x10u)
         .let(::loadFromMemory)
         .run {
             write(0x10u, 0xF5u)
-            test()
+            runTest()
 
             assertEquals(0xF5u, accumulator)
             assertEquals(statusWith(Flag.N), status)

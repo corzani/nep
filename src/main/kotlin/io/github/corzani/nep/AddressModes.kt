@@ -162,20 +162,29 @@ object IndirectX : AddressMode(addressFn(::indirectX))
 object IndirectY : AddressMode(addressFn(::indirectY))
 
 
-fun addressToString(address: U16) = "\$${address.toString(16).padStart(4, '0')}".toUpperCase()
-fun addressToString(address: U8) = "\$${address.toString(16).padStart(2, '0')}".toUpperCase()
+fun humanReadable(address: U16) = address.toString(16).padStart(4, '0').toUpperCase()
+fun humanReadable(address: U8) = address.toString(16).padStart(2, '0').toUpperCase()
+fun to6502Notation(address: U16) = address.splitLoHi { lo, hi ->
+    "${humanReadable(lo)}${humanReadable(hi)}"
+}
 
-fun Address.addressToString() = when (this.type) {
-    AddressType.Immediate -> "#${addressToString(address.lo8())}"
-    AddressType.Implied -> ""
-    AddressType.Relative -> addressToString(address)
-    AddressType.Indirect -> "(${addressToString(address)})"
-    AddressType.ZeroPage -> addressToString(address.lo8())
-    AddressType.ZeroPageX -> "${addressToString(address.lo8())},X"
-    AddressType.ZeroPageY -> "${addressToString(address.lo8())},Y"
-    AddressType.Absolute -> addressToString(address)
-    AddressType.AbsoluteX -> "${addressToString(address)},X"
-    AddressType.AbsoluteY -> "${addressToString(address)},Y"
-    AddressType.IndirectX -> "(${addressToString(address.lo8())},X)"
-    AddressType.IndirectY -> "(${addressToString(address.lo8())},Y)"
+fun translate(address: U16) = "0x${humanReadable(address)}:${address.toInt()}"
+
+fun Address.humanReadable(ram: Ram, computed: Boolean = true): String {
+    val currentAddress = if (computed) address else origin
+    return when (this.type) {
+        AddressType.Immediate -> read(ram, origin)
+            .let { value -> "#\$${humanReadable(value)} => Imm ${humanReadable(value)}:${value.toInt()}" }
+        AddressType.Implied -> ""
+        AddressType.Relative -> "\$${to6502Notation(origin)} => Addr ${translate(address)}"
+        AddressType.Indirect -> "(\$${to6502Notation(origin)}) => Addr ${translate(address)}"
+        AddressType.ZeroPage -> "\$${humanReadable(origin.lo8())} => Addr ${translate(address)}"
+        AddressType.ZeroPageX -> "\$${humanReadable(origin.lo8())},X => Addr ${translate(address)}"
+        AddressType.ZeroPageY -> "\$${humanReadable(origin.lo8())},Y => Addr ${translate(address)}"
+        AddressType.Absolute -> "\$${to6502Notation(origin)} => Addr ${translate(address)}"
+        AddressType.AbsoluteX -> "\$${to6502Notation(origin)},X => Addr ${translate(address)}"
+        AddressType.AbsoluteY -> "\$${to6502Notation(origin)},Y => Addr ${translate(address)}"
+        AddressType.IndirectX -> "(\$${humanReadable(origin.lo8())},X) => Addr ${translate(address)}"
+        AddressType.IndirectY -> "(\$${humanReadable(origin.lo8())},Y) => Addr ${translate(address)}"
+    }
 }
