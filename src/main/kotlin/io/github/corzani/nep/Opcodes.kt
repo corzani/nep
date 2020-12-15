@@ -8,7 +8,7 @@ fun opImpl(possibleAdditionalCycle: Boolean, block: NesArch.() -> Unit): (NesArc
     }
 
 // TODO Wrong! It's not the address but the fetched
-fun adc(addressMode: AddressMode) = opImpl(true) {
+fun adc(addressMode: Address) = opImpl(true) {
     val (fetched, address) = fetchFrom(addressMode)
 
     val sum = u16(fetched + accumulator + (status and 0x80u).rotateLeft(1))
@@ -22,13 +22,13 @@ fun adc(addressMode: AddressMode) = opImpl(true) {
     accumulator = sumLo8
 }
 
-fun and(addressMode: AddressMode) = opImpl(false) {
+fun and(addressMode: Address) = opImpl(false) {
     val (fetched, _) = fetchFrom(addressMode)
     accumulator = accumulator and fetched
     setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
 }
 
-fun asl(addressMode: AddressMode) = opImpl(false) {
+fun asl(addressMode: Address) = opImpl(false) {
 
     fun doShiftLeft(data: U8): U8 {
         setCarryFlag(data[7])
@@ -37,8 +37,8 @@ fun asl(addressMode: AddressMode) = opImpl(false) {
         }
     }
 
-    when (addressMode) {
-        Implied -> doShiftLeft(accumulator).also { accumulator = it }
+    when (addressMode.type) {
+        AddressType.Implied -> doShiftLeft(accumulator).also { accumulator = it }
         else -> {
             val (fetched, address) = fetchFrom(addressMode)
             fetched
@@ -48,88 +48,88 @@ fun asl(addressMode: AddressMode) = opImpl(false) {
     }
 }
 
-fun bcc(addressMode: AddressMode) = opImpl(false) {
+fun bcc(addressMode: Address) = opImpl(false) {
     branchOnFlag(addressMode, Flag.C, false)
 }
 
-fun bcs(addressMode: AddressMode) = opImpl(false) {
+fun bcs(addressMode: Address) = opImpl(false) {
     branchOnFlag(addressMode, Flag.C, true)
 }
 
-fun beq(addressMode: AddressMode) = opImpl(false) {
+fun beq(addressMode: Address) = opImpl(false) {
     branchOnFlag(addressMode, Flag.Z, true)
 }
 
-fun bit(addressMode: AddressMode) = opImpl(false) {
+fun bit(addressMode: Address) = opImpl(false) {
     val (fetched, _) = fetchFrom(addressMode)
     val temp = accumulator and fetched
     setZeroFlag(temp == u8(0u))
     setFlagsFrom(fetched, ::negativeFlag, ::overflowFlag)
 }
 
-fun bmi(addressMode: AddressMode) = opImpl(false) {
+fun bmi(addressMode: Address) = opImpl(false) {
     branchOnFlag(addressMode, Flag.N, true)
 
 }
 
-fun bne(addressMode: AddressMode) = opImpl(false) {
+fun bne(addressMode: Address) = opImpl(false) {
     branchOnFlag(addressMode, Flag.C, false)
 }
 
-fun bpl(addressMode: AddressMode) = opImpl(false) {
+fun bpl(addressMode: Address) = opImpl(false) {
     branchOnFlag(addressMode, Flag.N, false)
 }
 
-fun brk(addressMode: AddressMode) = opImpl(false) {
+fun brk(addressMode: Address) = opImpl(false) {
 }
 
-fun bvc(addressMode: AddressMode) = opImpl(false) {
+fun bvc(addressMode: Address) = opImpl(false) {
     branchOnFlag(addressMode, Flag.Z, false)
 }
 
-fun bvs(addressMode: AddressMode) = opImpl(false) {
+fun bvs(addressMode: Address) = opImpl(false) {
     branchOnFlag(addressMode, Flag.V, true)
 }
 
-fun clc(addressMode: AddressMode) = opImpl(false) {
+fun clc(addressMode: Address) = opImpl(false) {
     setCarryFlag(false)
 }
 
-fun cld(addressMode: AddressMode) = opImpl(false) {
+fun cld(addressMode: Address) = opImpl(false) {
     setDecimalFlag(false)
 }
 
-fun cli(addressMode: AddressMode) = opImpl(false) {
+fun cli(addressMode: Address) = opImpl(false) {
     setInterruptFlag(false)
 }
 
-fun clv(addressMode: AddressMode) = opImpl(false) {
+fun clv(addressMode: Address) = opImpl(false) {
     setOverflowFlag(false)
 }
 
 // TODO
-fun cmp(addressMode: AddressMode) = opImpl(true) {
+fun cmp(addressMode: Address) = opImpl(true) {
     val (fetched) = fetchFrom(addressMode)
 
     setCarryFlag(accumulator >= fetched)
     setFlagsFrom(u16(accumulator - fetched).lo8(), ::zeroFlag, ::negativeFlag)
 }
 
-fun cpx(addressMode: AddressMode) = opImpl(false) {
+fun cpx(addressMode: Address) = opImpl(false) {
     val (fetched, _) = fetchFrom(addressMode)
 
     setFlag(Flag.C, x >= fetched)
     setFlagsFrom(u16(x - fetched).lo8(), ::zeroFlag, ::negativeFlag)
 }
 
-fun cpy(addressMode: AddressMode) = opImpl(false) {
+fun cpy(addressMode: Address) = opImpl(false) {
     val (fetched, _) = fetchFrom(addressMode)
 
     setFlag(Flag.C, y >= fetched)
     setFlagsFrom(u16(y - fetched).lo8(), ::zeroFlag, ::negativeFlag)
 }
 
-fun dec(addressMode: AddressMode) = opImpl(false) {
+fun dec(addressMode: Address) = opImpl(false) {
     val (fetched, address) = fetchFrom(addressMode)
     val temp = u16(fetched - 1u).lo8() // This would be interesting to see what happen if u16 isn't used
 
@@ -137,62 +137,61 @@ fun dec(addressMode: AddressMode) = opImpl(false) {
     setFlagsFrom(temp, ::zeroFlag, ::negativeFlag)
 }
 
-fun dex(addressMode: AddressMode) = opImpl(false) {
+fun dex(addressMode: Address) = opImpl(false) {
     setFlagsFrom(--x, ::zeroFlag, ::negativeFlag)
 }
 
-fun dey(addressMode: AddressMode) = opImpl(false) {
+fun dey(addressMode: Address) = opImpl(false) {
     setFlagsFrom(--y, ::zeroFlag, ::negativeFlag)
 }
 
-fun eor(addressMode: AddressMode) = opImpl(true) {
+fun eor(addressMode: Address) = opImpl(true) {
     val (fetched) = fetchFrom(addressMode)
     accumulator = accumulator xor fetched
     setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
 }
 
-fun inc(addressMode: AddressMode) = opImpl(false) {
+fun inc(addressMode: Address) = opImpl(false) {
     val (fetched, address) = fetchFrom(addressMode)
     val temp = u16(fetched + 1u).lo8()
     write(address, temp)
     setFlagsFrom(temp, ::zeroFlag, ::negativeFlag)
 }
 
-fun inx(addressMode: AddressMode) = opImpl(false) {
+fun inx(addressMode: Address) = opImpl(false) {
     setFlagsFrom(++x, ::zeroFlag, ::negativeFlag)
 }
 
-fun iny(addressMode: AddressMode) = opImpl(false) {
+fun iny(addressMode: Address) = opImpl(false) {
     setFlagsFrom(--y, ::zeroFlag, ::negativeFlag)
 }
 
-fun jmp(addressMode: AddressMode) = opImpl(false) {
+fun jmp(addressMode: Address) = opImpl(false) {
     pc = fetchFrom(addressMode).address
 }
 
 // TODO Test at all costs!!!!
-fun jsr(addressMode: AddressMode) = opImpl(false) {
-    val (fetched, address) = fetchFrom(addressMode)
+fun jsr(addressMode: Address) = opImpl(false) {
     stackPush(u16(pc - 1u))
     pc = fetchFrom(addressMode).address
 }
 
-fun lda(addressMode: AddressMode) = opImpl(false) {
+fun lda(addressMode: Address) = opImpl(false) {
     accumulator = fetchFrom(addressMode).fetched
     setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
 }
 
-fun ldx(addressMode: AddressMode) = opImpl(true) {
+fun ldx(addressMode: Address) = opImpl(true) {
     x = fetchFrom(addressMode).fetched
     setFlagsFrom(x, ::zeroFlag, ::negativeFlag)
 }
 
-fun ldy(addressMode: AddressMode) = opImpl(true) {
+fun ldy(addressMode: Address) = opImpl(true) {
     y = fetchFrom(addressMode).fetched
     setFlagsFrom(y, ::zeroFlag, ::negativeFlag)
 }
 
-fun lsr(addressMode: AddressMode) = opImpl(false) {
+fun lsr(addressMode: Address) = opImpl(false) {
 
     val (fetched, address) = fetchFrom(addressMode)
 
@@ -201,31 +200,31 @@ fun lsr(addressMode: AddressMode) = opImpl(false) {
 
     setFlagsFrom(temp, ::zeroFlag, ::negativeFlag)
 
-    when (addressMode) {
-        Immediate -> {
+    when (addressMode.type) {
+        AddressType.Immediate -> {
             accumulator = temp
         }
         else -> write(address, temp)
     }
 }
 
-fun nop(addressMode: AddressMode) = when (addressMode) {
-    Implied -> opImpl(true) {}
+fun nop(addressMode: Address) = when (addressMode.type) {
+    AddressType.Implied -> opImpl(true) {}
     else -> opImpl(false) {}
 }
 
 
-fun ora(addressMode: AddressMode) = opImpl(true) {
+fun ora(addressMode: Address) = opImpl(true) {
     val (fetched) = fetchFrom(addressMode)
     accumulator = accumulator or fetched
     setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
 }
 
-fun pha(addressMode: AddressMode) = opImpl(false) {
+fun pha(addressMode: Address) = opImpl(false) {
     write(u16(0x0100u + stackPointer), accumulator).also { --stackPointer }
 }
 
-fun php(addressMode: AddressMode) = opImpl(false) {
+fun php(addressMode: Address) = opImpl(false) {
     write(u16(0x0100u + stackPointer), status or Flag.B.bitMask or Flag.U.bitMask)
         .also {
             setBreakFlag(false)
@@ -234,19 +233,20 @@ fun php(addressMode: AddressMode) = opImpl(false) {
         }
 }
 
-fun pla(addressMode: AddressMode) = opImpl(false) {
+fun pla(addressMode: Address) = opImpl(false) {
     ++stackPointer
     accumulator = read(u16(0x0100u + stackPointer))
     setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
 }
 
-fun plp(addressMode: AddressMode) = opImpl(false) {
+fun plp(addressMode: Address) = opImpl(false) {
     ++stackPointer
     status = read(u16(0x0100u + stackPointer))
     setFlag(Flag.U, true)
 }
 
-fun rol(addressMode: AddressMode) = opImpl(false) {
+fun rol(addressMode: Address) = opImpl(false) {
+
     val (fetched, address) = fetchFrom(addressMode)
 
     val temp = (u16(fetched).rotateLeft(1) or 0xFEu) or u16(Flag.C.bitMask)
@@ -254,8 +254,8 @@ fun rol(addressMode: AddressMode) = opImpl(false) {
     setZeroFlag(temp.lo8() == u8(0u))
     setNegativeFlag(temp[7])
 
-    when (addressMode) {
-        Implied -> {
+    when (addressMode.type) {
+        AddressType.Implied -> {
             accumulator = temp.lo8()
         }
         else -> write(address, temp.lo8())
@@ -263,7 +263,7 @@ fun rol(addressMode: AddressMode) = opImpl(false) {
 }
 
 // TODO Finish him!
-fun ror(addressMode: AddressMode) = opImpl(false) {
+fun ror(addressMode: Address) = opImpl(false) {
     fun carryFlagMask(): U8 = if (getFlag(Flag.C)) 0b10000000u else 0u
     //
 
@@ -273,8 +273,8 @@ fun ror(addressMode: AddressMode) = opImpl(false) {
     setCarryFlag((fetched and Flag.C.bitMask) > 0u)
     setFlagsFrom(temp, ::zeroFlag, ::negativeFlag)
 
-    when (addressMode) {
-        Implied -> {
+    when (addressMode.type) {
+        AddressType.Implied -> {
             accumulator = temp
         }
         else -> write(address, temp)
@@ -282,7 +282,7 @@ fun ror(addressMode: AddressMode) = opImpl(false) {
 }
 
 // TODO Check this infamous opcode
-fun rti(addressMode: AddressMode) = opImpl(false) {
+fun rti(addressMode: Address) = opImpl(false) {
     status = stackPop8()
     setFlag(Flag.B, false)
     setFlag(Flag.U, false)
@@ -290,13 +290,13 @@ fun rti(addressMode: AddressMode) = opImpl(false) {
     pc = stackPop16()
 }
 
-fun rts(addressMode: AddressMode) = opImpl(false) {
+fun rts(addressMode: Address) = opImpl(false) {
     pc = u16(stackPop16() + 1u)
 }
 
-fun sbc(addressMode: AddressMode) = opImpl(true) {
+fun sbc(addressMode: Address) = opImpl(true) {
 
-    val (fetched, address) = fetchFrom(addressMode)
+    val (fetched, _) = fetchFrom(addressMode)
 
     val value = fetched xor u8(0xFFu)
     val temp: U16 = u16(value + accumulator + (status and 0x80u).rotateLeft(1))
@@ -310,61 +310,61 @@ fun sbc(addressMode: AddressMode) = opImpl(true) {
     accumulator = tempLo8
 }
 
-fun sec(addressMode: AddressMode) = opImpl(false) {
+fun sec(addressMode: Address) = opImpl(false) {
     setCarryFlag(true)
 }
 
-fun sed(addressMode: AddressMode) = opImpl(false) {
+fun sed(addressMode: Address) = opImpl(false) {
     setDecimalFlag(true)
 }
 
-fun sei(addressMode: AddressMode) = opImpl(false) {
+fun sei(addressMode: Address) = opImpl(false) {
     setInterruptFlag(true)
 }
 
-fun sta(addressMode: AddressMode) = opImpl(false) {
+fun sta(addressMode: Address) = opImpl(false) {
     val (_, address) = fetchFrom(addressMode)
     write(address, accumulator)
 }
 
-fun stx(addressMode: AddressMode) = opImpl(false) {
+fun stx(addressMode: Address) = opImpl(false) {
     val (_, address) = fetchFrom(addressMode)
     write(address, x)
 }
 
-fun sty(addressMode: AddressMode) = opImpl(false) {
+fun sty(addressMode: Address) = opImpl(false) {
     val (_, address) = fetchFrom(addressMode)
     write(address, y)
 }
 
-fun tsx(addressMode: AddressMode) = opImpl(false) {
+fun tsx(addressMode: Address) = opImpl(false) {
     x = stackPointer
     setFlagsFrom(x, ::zeroFlag, ::negativeFlag)
 }
 
-fun tay(addressMode: AddressMode) = opImpl(false) {
+fun tay(addressMode: Address) = opImpl(false) {
     y = accumulator
     setFlagsFrom(y, ::zeroFlag, ::negativeFlag)
 }
 
 
-fun tax(addressMode: AddressMode) = opImpl(false) {
+fun tax(addressMode: Address) = opImpl(false) {
     x = accumulator
     setFlagsFrom(x, ::zeroFlag, ::negativeFlag)
 }
 
-fun txa(addressMode: AddressMode) = opImpl(false) {
+fun txa(addressMode: Address) = opImpl(false) {
     accumulator = x
     setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
 }
 
-fun txs(addressMode: AddressMode) = opImpl(false) {
+fun txs(addressMode: Address) = opImpl(false) {
     stackPointer = x
 }
 
-fun tya(addressMode: AddressMode) = opImpl(false) {
+fun tya(addressMode: Address) = opImpl(false) {
     accumulator = y
     setFlagsFrom(accumulator, ::zeroFlag, ::negativeFlag)
 }
 
-fun xxx(addressMode: AddressMode) = opImpl(false) { }
+fun xxx(addressMode: Address) = opImpl(false) { }

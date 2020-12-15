@@ -62,9 +62,7 @@ fun loadFromMemory(program: Program, block: NesArch.() -> Unit) =
 
 fun NesArch.getAddressFrom(addressMode: AddressMode) = addressMode.address(this)
 
-fun NesArch.fetchFrom(addressMode: AddressMode) =
-    addressMode.address(this).address.let {
-        FetchedAddress(fetched = this.read(it), address = it)
-    }
+fun NesArch.fetchFrom(addressMode: Address) =
+    FetchedAddress(fetched = this.read(addressMode.address), address = addressMode.address)
 
 fun createNes(block: NesArch.() -> Unit) = block(NesArch())

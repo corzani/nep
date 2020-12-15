@@ -5,7 +5,29 @@ typealias Program = UByteArray
 typealias U8 = UByte
 typealias U16 = UShort
 
-data class Address(val address: U16, val pageCrossed: Boolean, val length: Int)
+data class Address(
+    val address: U16,
+    val pageCrossed: Boolean,
+    val length: Int,
+    val origin: U16,
+    val type: AddressType
+)
+
+enum class AddressType(val addressModeName: String) {
+    Immediate("Immediate"),
+    Implied("Implied"),
+    Relative("Relative"),
+    Indirect("Indirect"),
+    ZeroPage("ZeroPage"),
+    ZeroPageX("ZeroPage X"),
+    ZeroPageY("ZeroPage Y"),
+    Absolute("Absolute"),
+    AbsoluteX("Absolute X"),
+    AbsoluteY("Absolute Y"),
+    IndirectX("Indirect X"),
+    IndirectY("Indirect Y")
+}
+
 data class FetchedAddress(val fetched: U8, val address: U16)
 data class U16Split(val lo: U8, val hi: U8)
 

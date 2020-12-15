@@ -24,12 +24,19 @@ fun instructionHandler(opcodes: List<Op>, nesArch: NesArch) = fun(opcode: U8): I
     val currentInstruction = opcodes[opcode.toInt()]
     ++nesArch.pc
     // TODO... Check when I have additional cycles
-    currentInstruction.instruction(nesArch) // TODO check additional Cycle
+
+    val result = currentInstruction.memory.address(nesArch)
+    val opcodeHex = "(0x${opcode.toString(16)})".toUpperCase()
+
+    println("$opcodeHex ${currentInstruction.name} ${result.addressToString()}")
+
+    currentInstruction.instruction(result) // TODO check additional Cycle
     return currentInstruction.cycles
 }
 
-data class Op(val name: String, val instruction: (NesArch) -> Boolean, val cycles: Int)
+typealias A = (NesArch) -> Boolean
 
+data class Op(val name: String, val instruction: (Address) -> A, val memory: AddressMode, val cycles: Int)
 
 @JvmName("getFlagFn")
 fun getFlag(nesArch: NesArch, flag: Flag): Boolean = nesArch.run {
