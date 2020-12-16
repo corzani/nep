@@ -12,6 +12,7 @@ enum class Flag(val mnemonic: String, val bitMask: U8) {
     V("Overflow", 0x40u),
     N("Negative", 0x80u)
 }
+
 fun retrieveFlag(status: U8, flag: Flag, value: Boolean = true) = when (value) {
     true -> status or (flag.bitMask)
     false -> status and (flag.bitMask.inv())

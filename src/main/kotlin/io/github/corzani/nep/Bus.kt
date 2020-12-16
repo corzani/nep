@@ -18,12 +18,14 @@ const val PPU_END = 0x3FFFu
 const val ROM = 0x8000u
 const val ROM_END = 0xFFFFu
 
+fun mapRomAddress(romSize: Int, address: U16) = u16(address % u16(romSize))
+
 //TODO create constants
 fun Bus.read(address: U16) = when (address) {
     in (RAM..RAM_END) -> read(vRam, address and 0b00000111_11111111u) // Check mirroring
     in (PPU..PPU_END) -> TODO()
     // TODO Check if mirror is needed
-    in (ROM..ROM_END) -> read(rom.prg, u16(address - 0x8000u))
+    in (ROM..ROM_END) -> read(rom.prg, mapRomAddress(rom.prgSize, u16(address - 0x8000u)))
     else -> TODO()
 }
 
@@ -37,7 +39,7 @@ fun Bus.write(address: U16, data: U8) = when (address) {
 fun Bus.read16(address: U16) = when (address) {
     in (RAM..RAM_END) -> read16(vRam, address and 0b00000111_11111111u) // Check mirroring
     in (PPU..PPU_END) -> TODO()
-    in (ROM..ROM_END) -> read16(rom.prg, u16(address - 0x8000u))
+    in (ROM..ROM_END) -> read16(rom.prg, mapRomAddress(rom.prgSize, u16(address - 0x8000u)))
     else -> TODO()
 }
 

@@ -38,7 +38,8 @@ data class Rom(
     val prg: UByteArray,
     val chr: UByteArray,
     val mapper: Int,
-    val screenMirroring: ScreenMirroring
+    val screenMirroring: ScreenMirroring,
+    val prgSize: Int
 )
 
 enum class ScreenMirroring {
@@ -50,6 +51,7 @@ fun rom(memory: UByteArray): Rom {
 
     val rom = Rom(
         prg = memory.copyOfRange(prgRomStart(memory), memory.size),
+        prgSize = prgRomSize(memory), // Mapping purposes
         chr = memory.copyOf(chrRomSize(memory)),
         mapper = mapperType(memory).toInt(),
         screenMirroring = screenMirroring(memory)

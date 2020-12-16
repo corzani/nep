@@ -1,11 +1,13 @@
 package io.github.corzani.nep
 
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 internal class OpcodesTest {
 
     @Test
-    fun adc() {}
+    fun adc() {
+    }
 
     @Test
     fun and() = mem(0x29u, 0b10101010u)
