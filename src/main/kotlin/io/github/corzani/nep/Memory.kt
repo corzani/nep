@@ -50,6 +50,7 @@ fun U16.isBitSet(ind: Int) = (this and u16(1u).rotateLeft(ind)) > 0u
 fun U8.isBitSet(ind: Int) = (this and u8(1u).rotateLeft(ind)) > 0u
 
 fun mem(vararg bytes: U8) = ubyteArrayOf(*bytes)
+fun nesRomWithHeader(vararg bytes: U8) = testRomHeader + mem(*bytes)
 
 fun incrementAddress(address: U16, increment: Byte): U16 =
     u16(address.toInt() + increment.toInt())

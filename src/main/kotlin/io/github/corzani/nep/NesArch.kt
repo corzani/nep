@@ -42,11 +42,12 @@ fun NesArch.stackPush(data: U16) = stackPush(this, data)
 fun NesArch.stackPop8() = stackPop8(this)
 fun NesArch.stackPop16() = stackPop16(this)
 
-fun NesArch.runTest() = testLoop(this, instructionHandler(opcodes(), this), u16(CARTRIDGE_ROM_ADDRESS + this.cartSize))
+fun NesArch.runTest() =
+    testLoop(this, instructionHandler(opcodes(), this), u16(CARTRIDGE_ROM_ADDRESS + this.cartSize - NES_HEADER_SIZE))
 
 // TODO Silly Implementation
 fun loadFromMemory(program: Program): NesArch =
-    NesArch(cartSize = program.size, bus = Bus(rom = rom(program.copyOf(ROM_SIZE).copyOf(2048))))
+    NesArch(cartSize = program.size, bus = Bus(rom = rom(program.copyOf(ROM_SIZE))))
 
 // TODO Silly Implementation
 fun loadFromMemory(program: Program, block: NesArch.() -> Unit) =

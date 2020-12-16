@@ -1,5 +1,16 @@
 package io.github.corzani.nep
 
+const val NES_HEADER_SIZE = 16
+
+const val PRG_PAGE_SIZE = 16 * 1024
+const val CHR_PAGE_SIZE = 8 * 1024
+
+val testRomHeader = mem(
+    0X4eU, 0X45U, 0X53U, 0X1AU, // Magic
+    0X01U, 0X01U, 0X00U, 0X00U, 0X00U, 0X00U, // Something useful here
+    0X00U, 0X00U, 0X00U, 0X00U, 0X00U, 0X00U // Reserved Unused
+)
+
 fun isNesRomHeader(header: UByteArray) =
     header.slice(IntRange(0, 3)) == ubyteArrayOf(0x4Eu, 0x45u, 0x53u, 0x1Au).toList()
 
@@ -18,10 +29,9 @@ fun screenMirroring(header: UByteArray): ScreenMirroring {
     }
 }
 
-fun prgRomSize(header: UByteArray) = header[4].toInt()
-fun chrRomSize(header: UByteArray) = header[5].toInt()
-
-fun prgRomStart(header: UByteArray) = 16 + if (skipTrainer(header)) 512 else 0
+fun prgRomSize(header: UByteArray) = header[4].toInt() * PRG_PAGE_SIZE
+fun chrRomSize(header: UByteArray) = header[5].toInt() * CHR_PAGE_SIZE
+fun prgRomStart(header: UByteArray) = NES_HEADER_SIZE + if (skipTrainer(header)) 516 else 0
 fun chrRomStart(header: UByteArray) = prgRomStart(header) + prgRomSize(header)
 
 data class Rom(
@@ -36,12 +46,13 @@ enum class ScreenMirroring {
 }
 
 fun rom(memory: UByteArray): Rom {
-//    check(isNesRomHeader(memory))
+    check(isNesRomHeader(memory))
 
-    return Rom(
-        prg = memory,//memory.sliceArray(IntRange(prgRomStart(memory), prgRomSize(memory))),
-        chr = memory.sliceArray(IntRange(chrRomStart(memory), chrRomSize(memory))),
+    val rom = Rom(
+        prg = memory.copyOfRange(prgRomStart(memory), memory.size),
+        chr = memory.copyOf(chrRomSize(memory)),
         mapper = mapperType(memory).toInt(),
         screenMirroring = screenMirroring(memory)
     )
+    return rom
 }
