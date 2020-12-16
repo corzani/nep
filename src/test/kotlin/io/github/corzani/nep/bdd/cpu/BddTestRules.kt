@@ -10,6 +10,7 @@ var lastInstance: NesArch? = null
 
 sealed class Register
 object Accumulator : Register()
+object ProgramCounter : Register()
 object X : Register()
 object Y : Register()
 
@@ -17,8 +18,9 @@ object Y : Register()
 class BddRules : En {
 
     init {
-        ParameterType("register", "Accumulator|X|Y") { register ->
+        ParameterType("register", "Accumulator|PC|X|Y") { register ->
             when (register) {
+                "PC" -> ProgramCounter
                 "Accumulator" -> Accumulator
                 "X" -> X
                 "Y" -> Y
@@ -73,9 +75,15 @@ class BddRules : En {
             checkNotNull(lastInstance)
             when (register) {
                 Accumulator -> lastInstance!!.accumulator = u8(num)
+                ProgramCounter -> lastInstance!!.pc = u16(num)
                 X -> lastInstance!!.x = u8(num)
                 Y -> lastInstance!!.y = u8(num)
             }
+        }
+
+        And("{flag} CPU flag is {enableDisable}") { flag: Flag, be: Boolean ->
+            checkNotNull(lastInstance)
+            lastInstance!!.setFlag(flag, be)
         }
 
         And("{binOrHex} is stored at address {binOrHex}") { data: Int, address: Int ->
@@ -85,11 +93,11 @@ class BddRules : En {
 
         Then("{register} register should be {binOrHex}") { register: Register, num: Int ->
             checkNotNull(lastInstance)
-            val expect = u8(num)
             when (register) {
-                Accumulator -> assertMemoryEquals(expect, lastInstance!!.accumulator)
-                X -> assertMemoryEquals(expect, lastInstance!!.x)
-                Y -> assertMemoryEquals(expect, lastInstance!!.y)
+                Accumulator -> assertMemoryEquals(u8(num), lastInstance!!.accumulator)
+                ProgramCounter -> assertMemoryEquals(u16(num), lastInstance!!.pc)
+                X -> assertMemoryEquals(u8(num), lastInstance!!.x)
+                Y -> assertMemoryEquals(u8(num), lastInstance!!.y)
             }
         }
 

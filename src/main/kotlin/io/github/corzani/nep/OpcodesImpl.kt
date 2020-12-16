@@ -1,6 +1,5 @@
 package io.github.corzani.nep
 
-
 fun opImpl(possibleAdditionalCycle: Boolean, block: NesArch.() -> Unit): (NesArch) -> Boolean =
     fun(nesArch: NesArch): Boolean {
         block(nesArch)
@@ -9,7 +8,7 @@ fun opImpl(possibleAdditionalCycle: Boolean, block: NesArch.() -> Unit): (NesArc
 
 // TODO Wrong! It's not the address but the fetched
 fun adc(addressMode: Address) = opImpl(true) {
-    val (fetched, address) = fetchFrom(addressMode)
+    val (fetched, _) = fetchFrom(addressMode)
 
     val sum = u16(fetched + accumulator + (status and 0x80u).rotateLeft(1))
     val sumLo8 = sum.lo8()
@@ -43,7 +42,9 @@ fun asl(addressMode: Address) = opImpl(false) {
             val (fetched, address) = fetchFrom(addressMode)
             fetched
                 .let(::doShiftLeft)
-                .let { write(address, it) }
+                .let {
+                    write(address, it)
+                }
         }
     }
 }
@@ -69,22 +70,20 @@ fun bit(addressMode: Address) = opImpl(false) {
 
 fun bmi(addressMode: Address) = opImpl(false) {
     branchOnFlag(addressMode, Flag.N, true)
-
 }
 
 fun bne(addressMode: Address) = opImpl(false) {
-    branchOnFlag(addressMode, Flag.C, false)
+    branchOnFlag(addressMode, Flag.Z, false)
 }
 
 fun bpl(addressMode: Address) = opImpl(false) {
     branchOnFlag(addressMode, Flag.N, false)
 }
 
-fun brk(addressMode: Address) = opImpl(false) {
-}
+fun brk(addressMode: Address) = opImpl(false) {}
 
 fun bvc(addressMode: Address) = opImpl(false) {
-    branchOnFlag(addressMode, Flag.Z, false)
+    branchOnFlag(addressMode, Flag.V, false)
 }
 
 fun bvs(addressMode: Address) = opImpl(false) {
@@ -192,7 +191,6 @@ fun ldy(addressMode: Address) = opImpl(true) {
 }
 
 fun lsr(addressMode: Address) = opImpl(false) {
-
     val (fetched, address) = fetchFrom(addressMode)
 
     setCarryFlag(fetched[0])
@@ -212,7 +210,6 @@ fun nop(addressMode: Address) = when (addressMode.type) {
     AddressType.Implied -> opImpl(true) {}
     else -> opImpl(false) {}
 }
-
 
 fun ora(addressMode: Address) = opImpl(true) {
     val (fetched) = fetchFrom(addressMode)
@@ -295,7 +292,6 @@ fun rts(addressMode: Address) = opImpl(false) {
 }
 
 fun sbc(addressMode: Address) = opImpl(true) {
-
     val (fetched, _) = fetchFrom(addressMode)
 
     val value = fetched xor u8(0xFFu)
@@ -346,7 +342,6 @@ fun tay(addressMode: Address) = opImpl(false) {
     y = accumulator
     setFlagsFrom(y, ::zeroFlag, ::negativeFlag)
 }
-
 
 fun tax(addressMode: Address) = opImpl(false) {
     x = accumulator

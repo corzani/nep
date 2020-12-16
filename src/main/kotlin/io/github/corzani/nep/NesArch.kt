@@ -43,7 +43,11 @@ fun NesArch.stackPop8() = stackPop8(this)
 fun NesArch.stackPop16() = stackPop16(this)
 
 fun NesArch.runTest() =
-    testLoop(this, instructionHandler(opcodes(), this), u16(CARTRIDGE_ROM_ADDRESS + this.cartSize - NES_HEADER_SIZE))
+    testLoop(
+        this,
+        instructionHandler(opcodes(), this),
+        u16(CARTRIDGE_ROM_ADDRESS + this.cartSize - NES_HEADER_SIZE)
+    )
 
 // TODO Silly Implementation
 fun loadFromMemory(program: Program): NesArch =

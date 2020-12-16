@@ -1,7 +1,7 @@
 package io.github.corzani.nep
 
 data class Ppu(
-    val chr: Memory,
+    val chrRom: Memory,
     val palette: Memory = Memory(32),
     val vRam: Memory = Memory(2048),
     val mirroring: ScreenMirroring,

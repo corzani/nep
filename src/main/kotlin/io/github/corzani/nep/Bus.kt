@@ -33,7 +33,7 @@ fun Bus.write(address: U16, data: U8) = when (address) {
     in (RAM..RAM_END) -> write(vRam, address and 0b00000111_11111111u, data) // Check mirroring
     in (PPU..PPU_END) -> TODO()
     in (ROM..ROM_END) -> throw IllegalStateException()
-    else -> TODO()
+    else -> throw IllegalStateException("Unable to write '0x${data.toString(16)}' to ${address.toString(16)}")
 }
 
 fun Bus.read16(address: U16) = when (address) {
