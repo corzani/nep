@@ -28,7 +28,7 @@ internal class AddressModesTest {
         val lo: U8 = 0xF0u
         val expectedAddress = fromLoHi(lo = lo, hi = hi)
 
-        loadFromMemory(mem(lo, hi, lo, hi, lo, hi)) {
+        test(nesRomWithHeader(lo, hi, lo, hi, lo, hi)) {
             x = regX
             y = regY
 
@@ -50,7 +50,7 @@ internal class AddressModesTest {
         val regY: U8 = 0xABu
         val expectedAddress: U8 = 0xF0u
 
-        loadFromMemory(mem(expectedAddress, expectedAddress, expectedAddress)) {
+        test(nesRomWithHeader(expectedAddress, expectedAddress, expectedAddress)) {
             x = regX
             y = regY
 
@@ -77,7 +77,7 @@ internal class AddressModesTest {
         val expectedAddressIndirectX = { reg: U8 -> fromLoHi(lo = u8(lo + reg), hi = hi) }
         val memory: U16 = fromLoHi(lo, hi)
 
-        loadFromMemory(mem(lo, lo)) {
+        test(nesRomWithHeader(lo, lo)) {
             x = regX
             y = regY
 

@@ -72,15 +72,15 @@ Feature: AND Opcodes
     And Z flag should be DISABLED
     And CPU should have performed 6 cycles
 
-  Scenario: AND (0x31) Indirect,Y
-    Given ROM memory "0x31 0xC0"
-    And Accumulator register is 0x8D
-    And Y register is 0xF2
-    And 0x8B is stored at address 0x00C0
-    And 0x7C is stored at address 0x00C1
-    And 0x8B is stored at address 0x7D7D
-    When code is executed
-    Then Accumulator register should be 0x89
-    And N flag should be ENABLED
-    And Z flag should be DISABLED
-    And CPU should have performed 5 cycles
+#  Scenario: AND (0x31) Indirect,Y
+#    Given ROM memory "0x31 0xC0"
+#    And Accumulator register is 0x8D
+#    And Y register is 0xF2
+#    And 0x8B is stored at address 0x00C0
+#    And 0x7C is stored at address 0x00C1
+#    And 0x8B is stored at address 0x7D7D
+#    When code is executed
+#    Then Accumulator register should be 0x89
+#    And N flag should be ENABLED
+#    And Z flag should be DISABLED
+#    And CPU should have performed 5 cycles

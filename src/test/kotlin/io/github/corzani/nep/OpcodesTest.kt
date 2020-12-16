@@ -10,15 +10,13 @@ internal class OpcodesTest {
     }
 
     @Test
-    fun and() = mem(0x29u, 0b10101010u)
-        .let(::loadFromMemory)
-        .run {
-            accumulator = 0b10001101u
-            runTest()
+    fun and() = test(nesRomWithHeader(0x29u, 0b10101010u)) {
+        accumulator = 0b10001101u
+        runTest()
 
-            assertEquals(u8(0b10101010u and 0b10001101u), accumulator)
-            assertEquals(statusWith(Flag.N), status)
-        }
+        assertEquals(u8(0b10101010u and 0b10001101u), accumulator)
+        assertEquals(statusWith(Flag.N), status)
+    }
 
     @Test
     fun asl() {
@@ -129,15 +127,15 @@ internal class OpcodesTest {
     }
 
     @Test
-    fun `LDA from memory`() = mem(0xa5u, 0x10u)
-        .let(::loadFromMemory)
-        .run {
-            write(0x10u, 0xF5u)
-            runTest()
+    fun `LDA from memory`() = test(
+        nesRomWithHeader(0xa5u, 0x10u)
+    ) {
+        write(0x10u, 0xF5u)
+        runTest()
 
-            assertEquals(0xF5u, accumulator)
-            assertEquals(statusWith(Flag.N), status)
-        }
+        assertEquals(0xF5u, accumulator)
+        assertEquals(statusWith(Flag.N), status)
+    }
 
     @Test
     fun ldx() {
