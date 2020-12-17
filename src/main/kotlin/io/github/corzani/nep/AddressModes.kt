@@ -171,7 +171,6 @@ fun to6502Notation(address: U16) = address.splitLoHi { lo, hi ->
 fun translate(address: U16) = "0x${humanReadable(address)}:${address.toInt()}"
 
 fun Address.humanReadable(bus: Bus, computed: Boolean = true): String {
-    val currentAddress = if (computed) address else origin
     return when (this.type) {
         AddressType.Immediate -> bus.read(origin)
             .let { value -> "#\$${humanReadable(value)} => Imm ${humanReadable(value)}:${value.toInt()}" }

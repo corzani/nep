@@ -23,5 +23,4 @@ internal class NesArchTest {
         --u8Var
         assertEquals(0xFFu, u8Var)
     }
-
 }
