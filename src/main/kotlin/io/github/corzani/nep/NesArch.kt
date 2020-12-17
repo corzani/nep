@@ -45,7 +45,7 @@ fun NesArch.stackPop16() = stackPop16(this)
 fun NesArch.runTest() =
     testLoop(
         this,
-        instructionHandler(opcodes(), this),
+        instructionHandler(this, opcodes()),
         u16(CARTRIDGE_ROM_ADDRESS + this.cartSize - NES_HEADER_SIZE)
     )
 
@@ -75,3 +75,12 @@ fun NesArch.setDecimalFlag(cond: Boolean) = setFlag(Flag.D, cond)
 fun NesArch.setInterruptFlag(cond: Boolean) = setFlag(Flag.I, cond)
 fun NesArch.setZeroFlag(cond: Boolean) = setFlag(Flag.Z, cond)
 fun NesArch.setCarryFlag(cond: Boolean) = setFlag(Flag.C, cond)
+
+fun NesArch.getFlag(flag: Flag): Boolean = this.status and flag.bitMask > 0u
+
+fun NesArch.setFlagsFrom(reg: U8, vararg functions: (status: U8, reg: U8) -> U8) {
+    status = flagsOf(status, reg, *functions)
+}
+
+fun NesArch.start() =
+    mainLoop(this, instructionHandler(this, opcodes()))

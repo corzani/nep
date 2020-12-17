@@ -1,4 +1,6 @@
-package io.github.corzani.nep
+package io.github.corzani.nep.cpu
+
+import io.github.corzani.nep.*
 
 fun branch(nesArch: NesArch, address: U16, flag: Flag, cond: Boolean) = onFlag(nesArch, flag, cond) {
     ++nesArch.cycles

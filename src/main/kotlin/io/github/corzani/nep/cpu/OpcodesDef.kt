@@ -1,5 +1,10 @@
 package io.github.corzani.nep
 
+import io.github.corzani.nep.cpu.*
+
+typealias InstructionFn = (NesArch) -> Boolean
+data class Op(val name: String, val instruction: (Address) -> InstructionFn, val memory: AddressMode, val cycles: Int)
+
 fun opcodes() = listOf(
 // ROW 0
     Op("BRK", ::brk, Immediate, 7),

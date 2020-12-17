@@ -90,6 +90,11 @@ fun stackPop16(nesArch: NesArch): U16 = nesArch.run {
     return read16(u16(0x0100u + this.stackPointer))
 }
 
+fun humanReadable(address: U16) = address.toString(16).padStart(4, '0').toUpperCase()
+fun humanReadable(address: U8) = address.toString(16).padStart(2, '0').toUpperCase()
 
+fun to6502Notation(address: U16) = address.splitLoHi { lo, hi ->
+    "${humanReadable(lo)}${humanReadable(hi)}"
+}
 
-
+fun translate(address: U16) = "0x${humanReadable(address)}:${address.toInt()}"

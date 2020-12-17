@@ -1,4 +1,6 @@
-package io.github.corzani.nep
+package io.github.corzani.nep.cpu
+
+import io.github.corzani.nep.*
 
 fun opImpl(possibleAdditionalCycle: Boolean, block: NesArch.() -> Unit): (NesArch) -> Boolean =
     fun(nesArch: NesArch): Boolean {
