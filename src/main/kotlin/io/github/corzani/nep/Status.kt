@@ -26,16 +26,3 @@ fun negativeFlag(status: U8, reg: U8): U8 =
 
 fun overflowFlag(status: U8, reg: U8): U8 =
     retrieveFlag(status, Flag.V, reg[6])
-
-
-fun NesArch.setFlag(flag: Flag, value: Boolean) {
-    status = retrieveFlag(status, flag, value)
-}
-
-fun NesArch.setNegativeFlag(cond: Boolean) = setFlag(Flag.N, cond)
-fun NesArch.setOverflowFlag(cond: Boolean) = setFlag(Flag.V, cond)
-fun NesArch.setBreakFlag(cond: Boolean) = setFlag(Flag.B, cond)
-fun NesArch.setDecimalFlag(cond: Boolean) = setFlag(Flag.D, cond)
-fun NesArch.setInterruptFlag(cond: Boolean) = setFlag(Flag.I, cond)
-fun NesArch.setZeroFlag(cond: Boolean) = setFlag(Flag.Z, cond)
-fun NesArch.setCarryFlag(cond: Boolean) = setFlag(Flag.C, cond)
