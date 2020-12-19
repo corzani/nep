@@ -26,11 +26,18 @@ data class Ppu(
 )
 
 data class AddrRegister(
-    val a: Pair<U8, U8>,
+    val address: U16,
     val hiPtr: Boolean
 )
 
-fun AddrRegister.update(u16: U16) = AddrRegister(a = Pair(u16.hi8(), u16.lo8()), this.hiPtr)
+fun mirrorAddress(address: U16) = if (address > 0x3FFFu) address and 0b11111111111111u else address
 
+fun AddrRegister.update(data: U8): AddrRegister = when (hiPtr) {
+    true -> (address and 0x00FFu) or u16(data).rotateLeft(8)
+    false -> (address and 0xFF00u) or u16(data)
+}.let(::mirrorAddress).let {
+    AddrRegister(it, !hiPtr)
+}
 
-fun addRegister() = AddrRegister(Pair(u8(0), u8(0)), true)
+fun AddrRegister.incr(value: Int) = (address + value).let(::mirrorAddress)
+fun AddrRegister.reset() = this.copy(hiPtr = true)

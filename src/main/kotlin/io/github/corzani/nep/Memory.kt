@@ -49,6 +49,9 @@ fun U16.hi8(): U8 = this.rotateRight(8).toUByte()
 fun U16.isBitSet(ind: Int) = (this and u16(1u).rotateLeft(ind)) > 0u
 fun U8.isBitSet(ind: Int) = (this and u8(1u).rotateLeft(ind)) > 0u
 
+operator fun U16.plus(value: U16): U16 = u16(this + value)
+operator fun U16.plus(value: Int): U16 = u16(this + u16(value))
+
 fun mem(vararg bytes: U8) = ubyteArrayOf(*bytes)
 fun nesRomWithHeader(vararg bytes: U8) = testRomHeader + mem(*bytes)
 
@@ -74,9 +77,7 @@ fun write16(ram: Memory, address: U16, data: U16) = data.splitLoHi { lo: U8, hi:
     }
 }
 
-fun stackPush(nesArch: NesArch, data: U8) = nesArch.run {
-    write(u16(0x0100u + --stackPointer), data)
-}
+fun stackPush(nesArch: NesArch, data: U8) = nesArch.run { write(u16(0x0100u + --stackPointer), data) }
 
 fun stackPush(nesArch: NesArch, data: U16) = nesArch.run {
     stackPointer = u8(stackPointer - 2u)
@@ -93,8 +94,6 @@ fun stackPop16(nesArch: NesArch): U16 = nesArch.run {
 fun humanReadable(address: U16) = address.toString(16).padStart(4, '0').toUpperCase()
 fun humanReadable(address: U8) = address.toString(16).padStart(2, '0').toUpperCase()
 
-fun to6502Notation(address: U16) = address.splitLoHi { lo, hi ->
-    "${humanReadable(lo)}${humanReadable(hi)}"
-}
+fun to6502Notation(address: U16) = address.splitLoHi { lo, hi -> "${humanReadable(lo)}${humanReadable(hi)}" }
 
 fun translate(address: U16) = "0x${humanReadable(address)}:${address.toInt()}"

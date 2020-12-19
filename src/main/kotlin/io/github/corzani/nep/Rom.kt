@@ -35,8 +35,8 @@ fun prgRomStart(header: UByteArray) = NES_HEADER_SIZE + if (skipTrainer(header))
 fun chrRomStart(header: UByteArray) = prgRomStart(header) + prgRomSize(header)
 
 data class Rom(
-    val prg: UByteArray,
-    val chr: UByteArray,
+    val prg: Memory,
+    val chr: Memory,
     val mapper: Int,
     val screenMirroring: ScreenMirroring,
     val prgSize: Int
