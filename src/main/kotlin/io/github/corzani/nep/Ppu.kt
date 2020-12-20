@@ -21,8 +21,8 @@ data class Ppu(
     val vRam: Memory = Memory(2048),
     val mirroring: ScreenMirroring,
     val oamData: Memory = Memory(256),
-    val addr: AddrRegister,
-    val ctrl: U8
+    val addressRegister: AddrRegister,
+    val ctrl: ControlRegister
 )
 
 data class AddrRegister(
@@ -41,3 +41,13 @@ fun AddrRegister.update(data: U8): AddrRegister = when (hiPtr) {
 
 fun AddrRegister.incr(value: Int) = (address + value).let(::mirrorAddress)
 fun AddrRegister.reset() = this.copy(hiPtr = true)
+
+fun Ppu.redirectTo(address: U16) = when (address.toInt()) {
+    in 0..0x1fff -> TODO("Chr Rom")
+    in 0x2000..0x2fff -> TODO("Ram")
+    in 0x3000..0x3eff -> throw IllegalStateException("Address ${humanReadable(address)} is not supposed to be used")
+    in 0x3f00..0x3fff -> (address - 0x3f00u).let { paletteAddr -> palette[paletteAddr.toInt()] }
+    else -> throw IllegalStateException("Unable to access to ${humanReadable(address)}")
+}
+
+fun Ppu.read() = redirectTo(addressRegister.incr(ctrl.vRamAddressIncrement()))
