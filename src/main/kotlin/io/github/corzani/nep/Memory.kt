@@ -11,7 +11,25 @@ data class Address(
     val length: Int,
     val origin: U16,
     val type: AddressType
-)
+) {
+    fun humanReadable(bus: Bus): String {
+        return when (this.type) {
+            AddressType.Immediate -> bus.read(origin)
+                .let { value -> "#\$${humanReadable(value)} => Imm ${humanReadable(value)}:${value.toInt()}" }
+            AddressType.Implied -> ""
+            AddressType.Relative -> "\$${to6502Notation(origin)} => Addr ${translate(address)}"
+            AddressType.Indirect -> "(\$${to6502Notation(origin)}) => Addr ${translate(address)}"
+            AddressType.ZeroPage -> "\$${humanReadable(origin.lo8())} => Addr ${translate(address)}"
+            AddressType.ZeroPageX -> "\$${humanReadable(origin.lo8())},X => Addr ${translate(address)}"
+            AddressType.ZeroPageY -> "\$${humanReadable(origin.lo8())},Y => Addr ${translate(address)}"
+            AddressType.Absolute -> "\$${to6502Notation(origin)} => Addr ${translate(address)}"
+            AddressType.AbsoluteX -> "\$${to6502Notation(origin)},X => Addr ${translate(address)}"
+            AddressType.AbsoluteY -> "\$${to6502Notation(origin)},Y => Addr ${translate(address)}"
+            AddressType.IndirectX -> "(\$${humanReadable(origin.lo8())},X) => Addr ${translate(address)}"
+            AddressType.IndirectY -> "(\$${humanReadable(origin.lo8())},Y) => Addr ${translate(address)}"
+        }
+    }
+}
 
 enum class AddressType(val addressModeName: String) {
     Immediate("Immediate"),

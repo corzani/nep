@@ -3,7 +3,6 @@ package io.github.corzani.nep.ppu
 import io.github.corzani.nep.*
 import io.github.corzani.nep.ppu.registers.AddrRegister
 import io.github.corzani.nep.ppu.registers.ControlRegister
-import io.github.corzani.nep.ppu.registers.incr
 import io.github.corzani.nep.ppu.registers.vRamAddressIncrement
 
 data class Ppu(
@@ -20,8 +19,8 @@ data class Ppu(
     var scanline: Int = 0
 )
 
-fun Ppu.tick(i: Int) {
-    cycles += i
+fun Ppu.tick(additionalCycles: Int) {
+    cycles += additionalCycles
     if (cycles >= 341) {
 
         cycles -= 341
