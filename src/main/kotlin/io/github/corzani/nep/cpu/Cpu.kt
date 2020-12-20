@@ -1,5 +1,6 @@
-package io.github.corzani.nep
+package io.github.corzani.nep.cpu
 
+import io.github.corzani.nep.*
 import io.github.corzani.nep.ppu.Ppu
 
 const val RAM_SIZE = 1024 * 64
