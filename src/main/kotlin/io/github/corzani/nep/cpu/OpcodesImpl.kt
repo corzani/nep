@@ -2,9 +2,9 @@ package io.github.corzani.nep.cpu
 
 import io.github.corzani.nep.*
 
-fun opImpl(possibleAdditionalCycle: Boolean, block: NesArch.() -> Unit): (NesArch) -> Boolean =
-    fun(nesArch: NesArch): Boolean {
-        block(nesArch)
+fun opImpl(possibleAdditionalCycle: Boolean, block: Cpu.() -> Unit): (Cpu) -> Boolean =
+    fun(cpu: Cpu): Boolean {
+        block(cpu)
         return possibleAdditionalCycle
     }
 

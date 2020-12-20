@@ -1,8 +1,6 @@
 package io.github.corzani.nep
 
 import io.github.corzani.nep.ppu.Ppu
-import io.github.corzani.nep.ppu.read
-import io.github.corzani.nep.ppu.tick
 
 const val VRAM_SIZE = 64 * 1024 // TODO It should be 2K
 const val ROM_SIZE = 2 * 1024 // TODO It should be 2K

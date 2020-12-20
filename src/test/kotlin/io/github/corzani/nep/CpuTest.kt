@@ -3,7 +3,7 @@ package io.github.corzani.nep
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-internal class NesArchTest {
+internal class CpuTest {
 
     @Test
     fun `Conversion between unsigned and signed`() {

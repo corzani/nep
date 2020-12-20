@@ -97,21 +97,21 @@ fun write16(ram: Memory, address: U16, data: U16) = data.splitLoHi { lo: U8, hi:
     }
 }
 
-fun stackPush(nesArch: NesArch, data: U8) = nesArch.run { write(u16(0x0100u + --stackPointer), data) }
+fun stackPush(cpu: Cpu, data: U8) = cpu.run { write(u16(0x0100u + --stackPointer), data) }
 
-fun stackPush(nesArch: NesArch, data: U16) = nesArch.run {
+fun stackPush(cpu: Cpu, data: U16) = cpu.run {
     stackPointer = u8(stackPointer - 2u)
     data.splitLoHi { lo: U8, hi: U8 ->
         (u16(0x0100u + this.stackPointer)).let {
-            nesArch.bus.write(it, lo)
-            nesArch.bus.write(u16(it + 1u), hi)
+            cpu.bus.write(it, lo)
+            cpu.bus.write(u16(it + 1u), hi)
         }
     }
 }
 
-fun stackPop8(nesArch: NesArch) = nesArch.run { read(u16(0x0100u + stackPointer++)) }
+fun stackPop8(cpu: Cpu) = cpu.run { read(u16(0x0100u + stackPointer++)) }
 
-fun stackPop16(nesArch: NesArch): U16 = nesArch.run {
+fun stackPop16(cpu: Cpu): U16 = cpu.run {
     stackPointer = u8(stackPointer + 2u)
 
     u16(0x0100u + this.stackPointer).let {

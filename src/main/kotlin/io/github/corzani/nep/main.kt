@@ -1,46 +1,46 @@
 package io.github.corzani.nep
 
-fun runAll(nesArch: NesArch) =
-    mainLoop(nesArch, instructionHandler(nesArch, opcodes()))
+fun runAll(cpu: Cpu) =
+    mainLoop(cpu, instructionHandler(cpu, opcodes()))
 
-tailrec fun mainLoop(nesArch: NesArch, runInstruction: Instruction) {
-    runInstruction(nesArch.bus.read(nesArch.pc))
-    mainLoop(nesArch, runInstruction)
+tailrec fun mainLoop(cpu: Cpu, runInstruction: Instruction) {
+    runInstruction(cpu.bus.read(cpu.pc))
+    mainLoop(cpu, runInstruction)
 }
 
 fun testLoop(
-    nesArch: NesArch,
+    cpu: Cpu,
     runInstruction: Instruction,
     runUntilPC: U16
 ) {
-    while (nesArch.pc < runUntilPC) {
-        val cycles = runInstruction(nesArch.bus.read(nesArch.pc))
-        nesArch.bus.tick(cycles)
+    while (cpu.pc < runUntilPC) {
+        val cycles = runInstruction(cpu.bus.read(cpu.pc))
+        cpu.bus.tick(cycles)
     }
 }
 
 // TODO toInt shouldn't be here
-fun instructionHandler(nesArch: NesArch, opcodes: List<Op>) = fun(opcode: U8): Int {
+fun instructionHandler(cpu: Cpu, opcodes: List<Op>) = fun(opcode: U8): Int {
     val currentInstruction = opcodes[opcode.toInt()]
-    ++nesArch.pc
+    ++cpu.pc
 
     // TODO... Check when I have additional cycles
 
-    val result = currentInstruction.memory.address(nesArch)
+    val result = currentInstruction.memory.address(cpu)
     val opcodeHex = "(0x${humanReadable(opcode)})"
 
-    println("$opcodeHex ${currentInstruction.name} ${result.humanReadable(nesArch.bus, false)}")
+    println("$opcodeHex ${currentInstruction.name} ${result.humanReadable(cpu.bus)}")
 
-    currentInstruction.instruction(result)(nesArch) // TODO check additional Cycle
+    currentInstruction.instruction(result)(cpu) // TODO check additional Cycle
     return currentInstruction.cycles
 }
 
-fun getFlag(nesArch: NesArch, flag: Flag): Boolean = nesArch.run {
+fun getFlag(cpu: Cpu, flag: Flag): Boolean = cpu.run {
     status and flag.bitMask > 0u
 }
 
-fun onFlag(nesArch: NesArch, flag: Flag, cond: Boolean, block: () -> Unit) {
-    when (getFlag(nesArch, flag) == cond) {
+fun onFlag(cpu: Cpu, flag: Flag, cond: Boolean, block: () -> Unit) {
+    when (getFlag(cpu, flag) == cond) {
         true -> block()
         false -> Unit
     }

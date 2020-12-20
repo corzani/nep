@@ -23,6 +23,6 @@ fun assertMemoryEquals(expected: U16, actual: U16) = asserter.assertTrue(
     actual == expected
 )
 
-fun <T> test(memory: UByteArray, block: NesArch.() -> T) = memory.let(::loadFromMemory).run {
+fun <T> test(memory: UByteArray, block: Cpu.() -> T) = memory.let(::loadFromMemory).run {
     block(this)
 }

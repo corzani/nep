@@ -6,7 +6,7 @@ import io.github.corzani.nep.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-var lastInstance: NesArch? = null
+var lastInstance: Cpu? = null
 
 sealed class Register
 object Accumulator : Register()

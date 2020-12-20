@@ -22,7 +22,15 @@ fun zeroFlag(status: U8, reg: U8): U8 =
     retrieveFlag(status, Flag.Z, reg == u8(0))
 
 fun negativeFlag(status: U8, reg: U8): U8 =
-    retrieveFlag(status, Flag.N, reg[7])
+    retrieveFlag(status, Flag.N, reg[Flag.N.ordinal])
 
 fun overflowFlag(status: U8, reg: U8): U8 =
-    retrieveFlag(status, Flag.V, reg[6])
+    retrieveFlag(status, Flag.V, reg[Flag.V.ordinal])
+
+fun interruptDisableFlag(status: U8, reg: U8): U8 =
+    retrieveFlag(status, Flag.I, reg[Flag.I.ordinal])
+
+fun withFlag(status: U8, bitMask: U8, value: Boolean = true) = when (value) {
+    true -> status or bitMask
+    false -> status and (bitMask.inv())
+}

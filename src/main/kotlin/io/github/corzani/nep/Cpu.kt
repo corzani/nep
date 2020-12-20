@@ -7,7 +7,7 @@ const val CARTRIDGE_ROM_ADDRESS = 0x8000
 
 typealias Instruction = (opcode: U8) -> Int
 
-class NesArch(
+class Cpu(
     var accumulator: U8 = 0x00u,
     var x: U8 = 0x00u,
     var y: U8 = 0x00u,
@@ -60,6 +60,18 @@ class NesArch(
     }
 
     fun start() = mainLoop(this, instructionHandler(this, opcodes()))
+
+    fun interruptNmi() {
+        stackPush(pc)
+        val statusA: U8 = (status or Flag.B.bitMask) and Flag.U.bitMask.inv()
+
+        stackPush(statusA)
+
+        status = withFlag(status, Flag.I.bitMask, true)
+
+        bus.tick(2)
+        pc = bus.read16(0xFFFAu)
+    }
 }
 
 //fun NesArch.initRam() {
@@ -72,8 +84,8 @@ fun initRam(ram: Memory) {
 }
 
 // TODO Silly Implementation
-fun loadFromMemory(program: Program): NesArch = rom(program.copyOf(ROM_SIZE)).let { rom ->
-    NesArch(
+fun loadFromMemory(program: Program): Cpu = rom(program.copyOf(ROM_SIZE)).let { rom ->
+    Cpu(
         cartSize = program.size,
         bus = Bus(
             rom = rom,
@@ -86,7 +98,7 @@ fun loadFromMemory(program: Program): NesArch = rom(program.copyOf(ROM_SIZE)).le
 }
 
 // TODO Silly Implementation
-fun loadFromMemory(program: Program, block: NesArch.() -> Unit) =
+fun loadFromMemory(program: Program, block: Cpu.() -> Unit) =
     loadFromMemory(program).run {
         block(this)
     }

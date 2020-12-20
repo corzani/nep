@@ -17,3 +17,4 @@ enum class ControlRegisterFlags(val bitMask: U8) {
 }
 
 fun ControlRegister.vRamAddressIncrement() = if (this[ControlRegisterFlags.VRAM_ADD_INCREMENT.ordinal]) 32 else 1
+fun ControlRegister.vblankNmi() = true
