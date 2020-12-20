@@ -51,7 +51,16 @@ fun NesArch.runTest() =
 
 // TODO Silly Implementation
 fun loadFromMemory(program: Program): NesArch =
-    NesArch(cartSize = program.size, bus = Bus(rom = rom(program.copyOf(ROM_SIZE))))
+    NesArch(
+        cartSize = program.size,
+        bus = Bus(
+            rom = rom(program.copyOf(ROM_SIZE)),
+            ppu = Ppu(
+                mirroring = ScreenMirroring.Horizontal,
+                chrRom = Memory(4)
+            )
+        )
+    )
 
 // TODO Silly Implementation
 fun loadFromMemory(program: Program, block: NesArch.() -> Unit) =

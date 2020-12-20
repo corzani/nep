@@ -9,7 +9,8 @@ enum class AccessMode {
 
 data class Bus(
     val vRam: Memory = Memory(VRAM_SIZE),
-    val rom: Rom = rom(Memory(ROM_SIZE))
+    val rom: Rom = rom(Memory(ROM_SIZE)),
+    val ppu: Ppu
 )
 
 const val RAM = 0x0000

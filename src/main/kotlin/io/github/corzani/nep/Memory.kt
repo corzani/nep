@@ -34,6 +34,8 @@ data class U16Split(val lo: U8, val hi: U8)
 operator fun U8.get(i: Int): Boolean = this.isBitSet(i)
 operator fun U16.get(i: Int): Boolean = this.isBitSet(i)
 
+operator fun Memory.get(i: U16): U8 = this[i.toInt()]
+
 fun u8(value: UInt) = value.toUByte()
 fun u8(value: Int) = value.toUByte()
 
