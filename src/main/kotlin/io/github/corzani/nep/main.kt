@@ -14,7 +14,8 @@ fun testLoop(
     runUntilPC: U16
 ) {
     while (nesArch.pc < runUntilPC) {
-        nesArch.cycles += runInstruction(nesArch.bus.read(nesArch.pc))
+        val cycles = runInstruction(nesArch.bus.read(nesArch.pc))
+        nesArch.bus.tick(cycles)
     }
 }
 

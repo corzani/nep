@@ -1,5 +1,7 @@
 package io.github.corzani.nep
 
+import io.github.corzani.nep.ppu.Ppu
+
 const val RAM_SIZE = 1024 * 64
 const val CARTRIDGE_ROM_ADDRESS = 0x8000
 

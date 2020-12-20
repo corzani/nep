@@ -1,5 +1,10 @@
 package io.github.corzani.nep
 
+import io.github.corzani.nep.ppu.Ppu
+import io.github.corzani.nep.ppu.read
+import io.github.corzani.nep.ppu.registers.update
+import io.github.corzani.nep.ppu.tick
+
 const val VRAM_SIZE = 64 * 1024 // TODO It should be 2K
 const val ROM_SIZE = 2 * 1024 // TODO It should be 2K
 
@@ -10,8 +15,14 @@ enum class AccessMode {
 data class Bus(
     val vRam: Memory = Memory(VRAM_SIZE),
     val rom: Rom = rom(Memory(ROM_SIZE)),
-    val ppu: Ppu
+    val ppu: Ppu,
+    var cycles: Int = 0
 )
+
+fun Bus.tick(additionalCycles: Int) {
+    cycles += additionalCycles
+    ppu.tick(additionalCycles * 6)
+}
 
 const val RAM = 0x0000
 const val RAM_END = 0x1FFF

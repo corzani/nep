@@ -123,7 +123,7 @@ class BddRules : En {
 
         And("CPU should have performed {int} cycles") { cycles: Int ->
             checkNotNull(lastInstance)
-            assertEquals(cycles, lastInstance!!.cycles)
+            assertEquals(cycles, lastInstance!!.bus.cycles)
         }
     }
 }

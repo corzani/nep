@@ -1,5 +1,7 @@
 package io.github.corzani.nep
 
+import io.github.corzani.nep.ppu.registers.AddrRegister
+import io.github.corzani.nep.ppu.registers.update
 import org.junit.Test
 import kotlin.test.assertEquals
 
