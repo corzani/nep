@@ -81,7 +81,7 @@ internal class AddressModesTest {
             x = regX
             y = regY
 
-            write16(u16(lo), memory)
+            bus.write16(u16(lo), memory)
 
             indirectX(this).let { (fetched) ->
                 assertMemoryEquals(expectedAddressIndirectX(regX), fetched)

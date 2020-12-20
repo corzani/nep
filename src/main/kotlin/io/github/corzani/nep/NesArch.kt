@@ -17,9 +17,9 @@ class NesArch(
     var cycles: Int = 0
 )
 
-fun NesArch.initRam() {
-    bus.write16(0xFFFCu, 0x8000u)
-}
+//fun NesArch.initRam() {
+//    bus.write16(0xFFFCu, 0x8000u)
+//}
 
 fun NesArch.incrementPcBy(value: Int) {
     pc = u16(pc + u16(value))
@@ -29,9 +29,9 @@ fun initRam(ram: Memory) {
     write16(ram, 0xFFFCu, 0x8000u)
 }
 
-fun NesArch.read16(address: U16): U16 = bus.read16(address)
+// fun NesArch.read16(address: U16): U16 = bus.read16(address)
 
-fun NesArch.write16(address: U16, data: U16) = bus.write16(address, data)
+// fun NesArch.write16(address: U16, data: U16) = bus.write16(address, data)
 
 fun NesArch.read(address: U16): U8 = bus.read(address)
 fun NesArch.write(address: U16, data: U8) = bus.write(address, data)
@@ -50,17 +50,18 @@ fun NesArch.runTest() =
     )
 
 // TODO Silly Implementation
-fun loadFromMemory(program: Program): NesArch =
+fun loadFromMemory(program: Program): NesArch = rom(program.copyOf(ROM_SIZE)).let { rom ->
     NesArch(
         cartSize = program.size,
         bus = Bus(
-            rom = rom(program.copyOf(ROM_SIZE)),
+            rom = rom,
             ppu = Ppu(
-                mirroring = ScreenMirroring.Horizontal,
-                chrRom = Memory(4)
+                mirroring = rom.screenMirroring,
+                chrRom = rom.chr
             )
         )
     )
+}
 
 // TODO Silly Implementation
 fun loadFromMemory(program: Program, block: NesArch.() -> Unit) =

@@ -83,14 +83,22 @@ fun stackPush(nesArch: NesArch, data: U8) = nesArch.run { write(u16(0x0100u + --
 
 fun stackPush(nesArch: NesArch, data: U16) = nesArch.run {
     stackPointer = u8(stackPointer - 2u)
-    write16(u16(0x0100u + this.stackPointer), data)
+    data.splitLoHi { lo: U8, hi: U8 ->
+        (u16(0x0100u + this.stackPointer)).let {
+            nesArch.bus.write(it, lo)
+            nesArch.bus.write(u16(it + 1u), hi)
+        }
+    }
 }
 
 fun stackPop8(nesArch: NesArch) = nesArch.run { read(u16(0x0100u + stackPointer++)) }
 
 fun stackPop16(nesArch: NesArch): U16 = nesArch.run {
     stackPointer = u8(stackPointer + 2u)
-    return read16(u16(0x0100u + this.stackPointer))
+
+    u16(0x0100u + this.stackPointer).let {
+        fromLoHi(lo = bus.read(it), hi = bus.read(u16(it + 1u)))
+    }
 }
 
 fun humanReadable(address: U16) = address.toString(16).padStart(4, '0').toUpperCase()

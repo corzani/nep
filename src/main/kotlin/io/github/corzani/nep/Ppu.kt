@@ -21,8 +21,8 @@ data class Ppu(
     val vRam: Memory = Memory(2048),
     val mirroring: ScreenMirroring,
     val oamData: Memory = Memory(256),
-    val addressRegister: AddrRegister = AddrRegister(0u, true),
-    val ctrl: ControlRegister = 0u,
+    var addressRegister: AddrRegister = AddrRegister(0u, true),
+    var ctrl: ControlRegister = 0u,
     var buffer: U8 = 0u
 )
 
@@ -50,9 +50,7 @@ fun Ppu.getAndSetBufferWith(value: U8): U8 {
 
 fun Ppu.ppuRead(address: U16): U8 = when (address.toInt()) { // TODO Too many toInts
     in 0..0x1FFF -> getAndSetBufferWith(chrRom[address.toInt()])
-    in 0x2000..0x2FFF -> getMirroredVramAddress(address).toInt().let { mirroredVramAddress ->
-        getAndSetBufferWith(vRam[mirroredVramAddress])
-    }
+    in 0x2000..0x2FFF -> getAndSetBufferWith(vRam[getMirroredVramAddress(address).toInt()])
     in 0x3000..0x3EFF -> throw IllegalStateException("Address ${humanReadable(address)} is not supposed to be used")
     in 0x3F00..0x3FFF -> (address - 0x3F00u).let { paletteAddr -> palette[paletteAddr.toInt()] }
     else -> throw IllegalStateException("Unable to access to ${humanReadable(address)}")
