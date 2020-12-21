@@ -1,5 +1,7 @@
 package io.github.corzani.nep
 
+import io.github.corzani.nep.cpu.Cpu
+
 typealias Memory = UByteArray
 typealias Program = UByteArray
 typealias U8 = UByte

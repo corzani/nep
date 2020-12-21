@@ -3,6 +3,8 @@ package io.github.corzani.nep.bdd.cpu
 import io.cucumber.java8.En
 import io.cucumber.java8.PendingException
 import io.github.corzani.nep.*
+import io.github.corzani.nep.cpu.Cpu
+import io.github.corzani.nep.cpu.loadFromMemory
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 

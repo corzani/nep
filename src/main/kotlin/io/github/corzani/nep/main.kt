@@ -1,5 +1,8 @@
 package io.github.corzani.nep
 
+import io.github.corzani.nep.cpu.Cpu
+import io.github.corzani.nep.cpu.Instruction
+
 fun runAll(cpu: Cpu) =
     mainLoop(cpu, instructionHandler(cpu, opcodes()))
 
@@ -32,6 +35,7 @@ fun instructionHandler(cpu: Cpu, opcodes: List<Op>) = fun(opcode: U8): Int {
     println("$opcodeHex ${currentInstruction.name} ${result.humanReadable(cpu.bus)}")
 
     currentInstruction.instruction(result)(cpu) // TODO check additional Cycle
+    println("       PC:${humanReadable(cpu.pc)} A:${humanReadable(cpu.accumulator)} X:${humanReadable(cpu.x)} Y:${humanReadable(cpu.y)} SP:${humanReadable(cpu.stackPointer)}")
     return currentInstruction.cycles
 }
 

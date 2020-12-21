@@ -1,5 +1,7 @@
 package io.github.corzani.nep
 
+import io.github.corzani.nep.cpu.Cpu
+import io.github.corzani.nep.cpu.loadFromMemory
 import kotlin.test.asserter
 
 sealed class Base(val base: Int, val places: Int, val prefix: String)

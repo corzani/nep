@@ -1,5 +1,7 @@
 package io.github.corzani.nep
 
+import io.github.corzani.nep.cpu.Cpu
+
 typealias AddressModeFn = (Cpu) -> Address
 
 sealed class AddressMode(val address: AddressModeFn)
@@ -130,7 +132,6 @@ fun zeroPageY(cpu: Cpu): Address =
             length = 1,
             origin = origin,
             type = AddressType.ZeroPageY
-
         )
     }
 
@@ -160,4 +161,3 @@ fun indirectY(cpu: Cpu): Address =
             type = AddressType.IndirectY
         )
     }
-
