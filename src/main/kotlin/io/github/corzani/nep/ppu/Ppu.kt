@@ -43,15 +43,15 @@ data class Ppu(
         return false
     }
 
-    fun getAndSetBufferWith(value: U8): U8 {
+    private fun getAndSetBufferWith(value: U8): U8 {
         val temp = buffer
         buffer = value
         return temp
     }
 
-    fun ppuRead(address: U16): U8 = when (address.toInt()) { // TODO Too many toInts
+    private fun ppuRead(address: U16): U8 = when (address.toInt()) { // TODO Too many toInts
         in 0..0x1FFF -> getAndSetBufferWith(chrRom[address.toInt()])
-        in 0x2000..0x2FFF -> getAndSetBufferWith(vRam[getMirroredVramAddress(address).toInt()])
+        in 0x2000..0x2FFF -> getAndSetBufferWith(vRam[getMirroredVRAMAddress(address).toInt()])
         in 0x3000..0x3EFF -> throw IllegalStateException("Address ${humanReadable(address)} is not supposed to be used")
         in 0x3F00..0x3FFF -> (address - 0x3F00u).let { paletteAddr -> palette[paletteAddr.toInt()] }
         else -> throw IllegalStateException("Unable to access to ${humanReadable(address)}")
@@ -68,9 +68,9 @@ data class Ppu(
         else -> 0u
     }
 
-    fun getMirroredVramAddress(address: U16): U16 {
-        val mirrorVram = address and 0b10111111111111u
-        val vRamIndex = mirrorVram - 0x2000u
+    private fun getMirroredVRAMAddress(address: U16): U16 {
+        val mirrorVRAM = address and 0b10111111111111u
+        val vRamIndex = mirrorVRAM - 0x2000u
         val nameTableIdx = (address / 0x0400u).toInt()
         return u16(vRamIndex - nameTableOffSet(NameTable(mirroring, nameTableIdx)))
     }
