@@ -1,6 +1,7 @@
 package io.github.corzani.nep
 
 import io.github.corzani.nep.cpu.Cpu
+import java.io.File
 
 typealias Memory = UByteArray
 typealias Program = UByteArray
@@ -76,6 +77,8 @@ operator fun U16.plus(value: Int): U16 = u16(this + u16(value))
 
 fun mem(vararg bytes: U8) = ubyteArrayOf(*bytes)
 fun nesRomWithHeader(vararg bytes: U8) = testRomHeader + mem(*bytes)
+
+fun nesRomFromFile(file: String): Memory = File(file).readBytes().toUByteArray()
 
 fun incrementAddress(address: U16, increment: Byte): U16 =
     u16(address.toInt() + increment.toInt())
