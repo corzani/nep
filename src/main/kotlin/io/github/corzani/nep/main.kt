@@ -11,6 +11,19 @@ tailrec fun mainLoop(cpu: Cpu, runInstruction: Instruction) {
     mainLoop(cpu, runInstruction)
 }
 
+fun printHeader(columns: Int) = (0 until columns).joinToString(" ") { humanReadable(u8(it)) }
+
+fun printMemory(memory: Memory, size: Int, offset: Int = 0) {
+    print("       ${printHeader(16)}")
+    (0..size).forEach { idx ->
+        if (idx % 16 == 0) {
+            println()
+            print("${humanReadable(u16(idx + offset))} : ")
+        }
+        print("${humanReadable(memory[idx])} ")
+    }
+}
+
 fun testLoop(
     cpu: Cpu,
     runInstruction: Instruction,
@@ -35,7 +48,13 @@ fun instructionHandler(cpu: Cpu, opcodes: List<Op>) = fun(opcode: U8): Int {
     println("$opcodeHex ${currentInstruction.name} ${result.humanReadable(cpu.bus)}")
 
     currentInstruction.instruction(result)(cpu) // TODO check additional Cycle
-    println("       PC:${humanReadable(cpu.pc)} A:${humanReadable(cpu.accumulator)} X:${humanReadable(cpu.x)} Y:${humanReadable(cpu.y)} SP:${humanReadable(cpu.stackPointer)}")
+    println(
+        "       PC:${humanReadable(cpu.pc)} A:${humanReadable(cpu.accumulator)} X:${humanReadable(cpu.x)} Y:${
+            humanReadable(
+                cpu.y
+            )
+        } SP:${humanReadable(cpu.stackPointer)}"
+    )
     return currentInstruction.cycles
 }
 

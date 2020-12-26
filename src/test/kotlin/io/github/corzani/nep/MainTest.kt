@@ -1,10 +1,5 @@
 package io.github.corzani.nep
 
-import io.github.corzani.nep.ui.showTitle
-import java.awt.Graphics2D
-import java.awt.Image
-import java.awt.image.BufferedImage
-import java.awt.image.DataBufferByte
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -72,17 +67,21 @@ class MainTest {
 
     @Test
     fun `Test Sokoban()`() = test(
-        nesRomFromFile("./src/test/resources/SOKOBAN.NES")
+        nesRomWithHeader(0x99u, 0x99u, 0x9Cu)
+        // nesRomFromFile("./src/test/resources/pm.nes")
     ) {
-        val b = showTitle(bus.ppu.chrRom, 0u, 0)
 
-        val img = BufferedImage(300, 300, BufferedImage.TYPE_3BYTE_BGR);
-        val array = (img.raster.dataBuffer as DataBufferByte).data
+        printMemory(bus.rom.prg, 0x400, 0x8000)
 
+//        val b = showTitle(bus.ppu.chrRom, 0u, 0)
+//
+//        val img = BufferedImage(300, 300, BufferedImage.TYPE_3BYTE_BGR);
+//        val array = (img.raster.dataBuffer as DataBufferByte).data
+//
+//
+//        System.arraycopy(b, 0, array, 0, array.size)
 
-        System.arraycopy(b, 0, array, 0, array.size)
-
-        //  runTest()
+        runTest()
     }
 
     @Test
