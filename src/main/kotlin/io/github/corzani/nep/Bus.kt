@@ -1,5 +1,6 @@
 package io.github.corzani.nep
 
+import io.github.corzani.nep.mappers.MapperFn
 import io.github.corzani.nep.ppu.Ppu
 
 const val VRAM_SIZE = 64 * 1024 // TODO It should be 2K
@@ -18,7 +19,8 @@ data class Bus(
     val vRam: Memory = Memory(VRAM_SIZE),
     val rom: Rom = rom(Memory(ROM_SIZE)),
     val ppu: Ppu,
-    var cycles: Int = 0
+    var cycles: Int = 0,
+    val mapperFn: MapperFn = { address -> address }
 ) {
 
     private fun mapRomAddress(romSize: Int, address: U16) = u16(address % u16(romSize))
@@ -70,6 +72,7 @@ data class Bus(
 
     fun write(address: U16, data: U8) = writeToBus(address, data)
 
+    @Deprecated("This call doesn't use mappers, do not use it or expect the worst...")
     fun write16(
         address: U16,
         data: U16
