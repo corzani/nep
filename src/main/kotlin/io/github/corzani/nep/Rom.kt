@@ -1,5 +1,8 @@
 package io.github.corzani.nep
 
+import io.github.corzani.nep.mappers.Mapper
+import io.github.corzani.nep.mappers.mapper
+
 const val NES_HEADER_SIZE = 16
 
 const val PRG_PAGE_SIZE = 16 * 1024
@@ -37,7 +40,8 @@ fun chrRomStart(header: UByteArray) = prgRomStart(header) + prgRomSize(header)
 data class Rom(
     val prg: Memory,
     val chr: Memory,
-    val mapper: Int,
+    val mapperId: Int,
+    val mapper: Mapper,
     val screenMirroring: ScreenMirroring,
     val prgSize: Int
 )
@@ -70,6 +74,7 @@ fun headerOf(memory: Memory): NesHeader = memory.let {
 
 fun rom(memory: UByteArray): Rom {
     val header = headerOf(memory)
+    val mapperId = mapperType(memory).toInt()
 
     println(header)
 
@@ -77,7 +82,8 @@ fun rom(memory: UByteArray): Rom {
         prg = memory.copyOfRange(prgRomStart(memory), memory.size),
         prgSize = prgRomSize(memory), // Mapping purposes
         chr = memory.copyOf(chrRomSize(memory)),
-        mapper = mapperType(memory).toInt(),
+        mapperId = mapperId,
+        mapper = mapper(mapperId, header),
         screenMirroring = screenMirroring(memory)
     )
 }

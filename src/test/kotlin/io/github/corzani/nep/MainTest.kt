@@ -67,11 +67,14 @@ class MainTest {
 
     @Test
     fun `Test Sokoban()`() = test(
-        nesRomWithHeader(0x99u, 0x99u, 0x9Cu)
-        // nesRomFromFile("./src/test/resources/pm.nes")
+        //nesRomWithHeader(0x99u, 0x99u, 0x9Cu)
+        nesRomFromFile("./src/test/resources/pm.nes")
     ) {
 
-        printMemory(bus.rom.prg, 0x400, 0x8000)
+        val pippo = bus.read16(0xFFFCu)
+        println(pippo.toString(16))
+
+//        printMemory(bus.rom.prg, 0x400, 0x8000)
 
 //        val b = showTitle(bus.ppu.chrRom, 0u, 0)
 //

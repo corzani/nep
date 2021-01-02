@@ -1,6 +1,7 @@
 package io.github.corzani.nep.ppu
 
 import io.github.corzani.nep.*
+import io.github.corzani.nep.mappers.MapperFn
 import io.github.corzani.nep.ppu.registers.AddrRegister
 import io.github.corzani.nep.ppu.registers.ControlRegister
 import io.github.corzani.nep.ppu.registers.StatusRegister.VBLANK_STARTED
@@ -58,6 +59,10 @@ data class Ppu(
     }
 
     fun read() = ppuRead(addressRegister.incr(ctrl.vRamAddressIncrement()))
+    fun read(mapperFn: MapperFn) = addressRegister.incr(ctrl.vRamAddressIncrement()).let {
+        // TODO Find a way to extract this MappedAddress pageEx
+        (ppuRead(mapperFn(it).address))
+    }
 
     private fun nameTableOffSet(nameTable: NameTable): UInt = when (nameTable) {
         NameTable(ScreenMirroring.Vertical, 2),

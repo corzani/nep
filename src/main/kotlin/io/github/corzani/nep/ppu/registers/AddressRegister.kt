@@ -19,7 +19,7 @@ data class AddrRegister(
         AddrRegister(it, !hiPtr)
     }
 
-    fun incr(value: Int) = (address + value).let(::mirrorAddress)
+    fun incr(value: Int): U16 = (address + value).let(::mirrorAddress)
 
     fun reset() = this.copy(hiPtr = true)
 }

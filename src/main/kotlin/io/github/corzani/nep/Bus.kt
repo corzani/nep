@@ -1,6 +1,6 @@
 package io.github.corzani.nep
 
-import io.github.corzani.nep.mappers.MapperFn
+import io.github.corzani.nep.mappers.Mapper
 import io.github.corzani.nep.ppu.Ppu
 
 const val VRAM_SIZE = 64 * 1024 // TODO It should be 2K
@@ -20,7 +20,7 @@ data class Bus(
     val rom: Rom = rom(Memory(ROM_SIZE)),
     val ppu: Ppu,
     var cycles: Int = 0,
-    val mapperFn: MapperFn = { address -> address }
+    val mapper: Mapper
 ) {
 
     private fun mapRomAddress(romSize: Int, address: U16) = u16(address % u16(romSize))
@@ -36,9 +36,12 @@ data class Bus(
         0x2000, 0x2001, 0x2003, 0x2005, 0x2006, 0x4014 -> throw NotImplementedError(
             "Write only Address ${humanReadable(address)} shouldn't be read"
         )
-        0x2007 -> ppu.read()
-        0x2008 -> readFromBus(address and 0b00100000_00000111u)
-        in ROM..ROM_END -> read(rom.prg, mapRomAddress(rom.prgSize, u16(address - 0x8000u)))
+        0x2007 -> ppu.read(mapper.readPpu)
+        0x2008 -> readFromBus(mapper.readPpu(address).address and 0b00100000_00000111u)
+        in ROM..ROM_END -> read(
+            rom.prg,
+            mapRomAddress(rom.prgSize, u16(mapper.readMemAddress(address).address - 0x8000u))
+        )
         else -> throw NotImplementedError("Address 0x${humanReadable(address)} is not in the range of accessible memory")
 //    else -> 0u
     }

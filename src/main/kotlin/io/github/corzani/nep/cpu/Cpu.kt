@@ -89,6 +89,7 @@ fun loadFromMemory(program: Program): Cpu = rom(program.copyOf(ROM_SIZE)).let { 
     Cpu(
         cartSize = program.size,
         bus = Bus(
+            mapper = rom.mapper,
             rom = rom,
             ppu = Ppu(
                 mirroring = rom.screenMirroring,
